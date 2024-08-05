@@ -15,16 +15,17 @@ function App() {
     <Router>
       <div className="App">
         <Header />
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <Contact />
         <Routes>
-          <Route path="/" exact>
-              
-          </Route>
-          <Route path="/signup" component={SignUp} />
-          <Route path="/login" component={Login} />
+          <Route path="/" element={
+            <>
+              <Hero />
+              <Features />
+              <HowItWorks />
+              <Contact />
+            </>
+          } />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
         <Footer />
       </div>

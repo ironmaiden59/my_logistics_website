@@ -2,33 +2,55 @@ import React from 'react';
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="bg-gray-50 py-16">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-10">How It Works</h2>
-        <ol className="flex flex-wrap justify-between gap-4">
-          <li className="relative bg-white p-6 rounded shadow-lg text-center w-full md:w-1/4">
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white w-12 h-12 rounded-full flex justify-center items-center font-bold">
+    <section id="how-it-works" className="bg-white py-24">
+      <div className="container mx-auto text-center">
+        <h2 className="text-4xl font-bold mb-12">How It Works</h2>
+        <ol className="flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0 md:space-x-8">
+          <li className="flex-1 bg-gray-50 p-8 rounded-lg shadow-md relative">
+            <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white w-12 h-12 flex justify-center items-center rounded-full">
               1
-            </div>
-            <p><strong>Browse or List:</strong> Find great deals or list items you want to sell.</p>
+            </span>
+            <strong className="block mb-2 text-lg font-semibold text-blue-600">
+              Browse or List
+            </strong>
+            <p className="text-gray-600">
+              Find great deals or list items you want to sell.
+            </p>
           </li>
-          <li className="relative bg-white p-6 rounded shadow-lg text-center w-full md:w-1/4">
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white w-12 h-12 rounded-full flex justify-center items-center font-bold">
+          <li className="flex-1 bg-gray-50 p-8 rounded-lg shadow-md relative">
+            <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white w-12 h-12 flex justify-center items-center rounded-full">
               2
-            </div>
-            <p><strong>Buy or Sell:</strong> Make a purchase or connect with buyers using our platform.</p>
+            </span>
+            <strong className="block mb-2 text-lg font-semibold text-blue-600">
+              Buy or Sell
+            </strong>
+            <p className="text-gray-600">
+              Make a purchase or connect with buyers using our platform.
+            </p>
           </li>
-          <li className="relative bg-white p-6 rounded shadow-lg text-center w-full md:w-1/4">
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white w-12 h-12 rounded-full flex justify-center items-center font-bold">
+          <li className="flex-1 bg-gray-50 p-8 rounded-lg shadow-md relative">
+            <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white w-12 h-12 flex justify-center items-center rounded-full">
               3
-            </div>
-            <p><strong>We Handle Logistics:</strong> Our team manages the pickup and delivery, so you don't have to lift a finger.</p>
+            </span>
+            <strong className="block mb-2 text-lg font-semibold text-blue-600">
+              We Handle Logistics
+            </strong>
+            <p className="text-gray-600">
+              Our team manages the pickup and delivery, so you don't have to
+              lift a finger.
+            </p>
           </li>
-          <li className="relative bg-white p-6 rounded shadow-lg text-center w-full md:w-1/4">
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white w-12 h-12 rounded-full flex justify-center items-center font-bold">
+          <li className="flex-1 bg-gray-50 p-8 rounded-lg shadow-md relative">
+            <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white w-12 h-12 flex justify-center items-center rounded-full">
               4
-            </div>
-            <p><strong>Relax and Receive:</strong> Sit back and enjoy while your item is delivered directly to your door.</p>
+            </span>
+            <strong className="block mb-2 text-lg font-semibold text-blue-600">
+              Relax and Receive
+            </strong>
+            <p className="text-gray-600">
+              Sit back and enjoy while your item is delivered directly to your
+              door.
+            </p>
           </li>
         </ol>
       </div>

@@ -5,7 +5,7 @@ import Features from './components/Features';
 import HowItWorks from './components/HowitWorks';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import './styles/styles.css'; // Ensure Tailwind CSS is imported here
+import './styles/styles.css'; 
 
 function App() {
   return (

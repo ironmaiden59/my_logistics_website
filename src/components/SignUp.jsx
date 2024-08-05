@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
   });
@@ -25,14 +26,28 @@ const SignUp = () => {
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Sign Up</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Name
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+              First Name
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
               onChange={handleChange}
               required
               className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -74,7 +89,10 @@ const SignUp = () => {
           </button>
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
-          Already have an account? <a href="/login" className="text-blue-600 hover:underline">Log In</a>
+          Already have an account?{' '}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Log In
+          </a>
         </p>
       </div>
     </div>

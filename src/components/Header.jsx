@@ -30,15 +30,15 @@ const Header = () => {
               </a>
             </li>
             <li>
-              <a href="#signup" className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                Sign Up
-              </a>
-            </li>
-            <li>
-              <a href="#login" className="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                Login
-              </a>
-            </li>
+  <a href="/signup" className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+    Sign Up
+  </a>
+</li>
+<li>
+  <a href="/login" className="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+    Login
+  </a>
+</li>
           </ul>
         </nav>
       </div>

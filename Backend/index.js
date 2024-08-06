@@ -89,6 +89,105 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// User profile endpoint
+app.get('/user/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      address: user.address || ''
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.put('/user/profile', authenticateToken, async (req, res) => {
+  const { firstName, lastName, email, address } = req.body;
+
+  try {
+    const user = await User.findByPk(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    await user.update({ firstName, lastName, email, address });
+
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Password management endpoint
+app.put('/user/password', authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findByPk(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashedPassword });
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Preferences endpoint
+app.get('/user/preferences', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      receiveNotifications: user.receiveNotifications || false,
+      preferredDeliveryOption: user.preferredDeliveryOption || 'standard'
+    });
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.put('/user/preferences', authenticateToken, async (req, res) => {
+  const { receiveNotifications, preferredDeliveryOption } = req.body;
+
+  try {
+    const user = await User.findByPk(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    await user.update({ receiveNotifications, preferredDeliveryOption });
+
+    res.status(200).json({ message: 'Preferences updated successfully' });
+  } catch (error) {
+    console.error('Error updating preferences:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

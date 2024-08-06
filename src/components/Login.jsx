@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +10,8 @@ const Login = () => {
   });
 
   const [error, setError] = useState(null); // State for handling errors
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,20 +24,20 @@ const Login = () => {
     try {
       // Send a POST request to the login endpoint
       const response = await axios.post('http://localhost:5000/login', formData);
-      
-      console.log('Login successful:', response.data);
-      
-      // Store the token (e.g., in localStorage or context)
+
+      // Store the JWT token in local storage
       localStorage.setItem('token', response.data.token);
-      
-      // Optionally redirect the user to another page
-      alert('Login successful!');
+
+      // Update the authentication state
+      login();
+
+      // Optionally navigate to the profile page or another page
+      navigate('/profile');
+
       setError(null); // Clear any previous errors
 
     } catch (err) {
       console.error('Error logging in:', err.response?.data || err.message);
-      
-      // Set an error message
       setError(err.response?.data?.message || 'An error occurred during login.');
     }
   };

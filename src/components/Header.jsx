@@ -4,6 +4,12 @@ import { AuthContext } from '../contexts/AuthContext'; // Import AuthContext
 
 const Header = () => {
   const { isAuthenticated, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(); // Update the authentication state
+    navigate('/'); // Redirect to the home page
+  };
 
   return (
     <header className="bg-white shadow-md">

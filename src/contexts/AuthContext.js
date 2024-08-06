@@ -7,8 +7,8 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check for a valid token in local storage when the component mounts
   useEffect(() => {
+    // Check if the user is authenticated by looking for a token in local storage
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token); // Convert token presence to a boolean
   }, []);

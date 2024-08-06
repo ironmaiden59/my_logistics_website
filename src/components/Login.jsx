@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -6,16 +7,35 @@ const Login = () => {
     password: '',
   });
 
+  const [error, setError] = useState(null); // State for handling errors
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add login logic here (e.g., authenticate with an API)
-    console.log('Login form submitted', formData);
-    alert('Login successful!');
+
+    try {
+      // Send a POST request to the login endpoint
+      const response = await axios.post('http://localhost:5000/login', formData);
+      
+      console.log('Login successful:', response.data);
+      
+      // Store the token (e.g., in localStorage or context)
+      localStorage.setItem('token', response.data.token);
+      
+      // Optionally redirect the user to another page
+      alert('Login successful!');
+      setError(null); // Clear any previous errors
+
+    } catch (err) {
+      console.error('Error logging in:', err.response?.data || err.message);
+      
+      // Set an error message
+      setError(err.response?.data?.message || 'An error occurred during login.');
+    }
   };
 
   return (
@@ -57,6 +77,7 @@ const Login = () => {
           >
             Login
           </button>
+          {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
           Don't have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign Up</a>

@@ -1,5 +1,4 @@
 require('dotenv').config();
-console.log('Environment Variables:', process.env);
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');

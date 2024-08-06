@@ -1,12 +1,17 @@
 require('dotenv').config();
+console.log('Environment Variables:', process.env);
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');
 const { User } = require('./models'); // Import User model
+const cors = require('cors');
+
+
 
 const app = express();
 app.use(express.json());
+app.use(cors()); // Enable all CORS requests
 
 // Connect to PostgreSQL
 const sequelize = new Sequelize(

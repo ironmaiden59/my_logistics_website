@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -8,16 +9,38 @@ const SignUp = () => {
     password: '',
   });
 
+  const [error, setError] = useState(null); // State for handling errors
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add sign-up logic here (e.g., send data to an API)
-    console.log('Sign-up form submitted', formData);
-    alert('Sign-up successful!');
+
+    try {
+      // Send a POST request to the signup endpoint
+      const response = await axios.post('http://localhost:5000/signup', formData);
+      
+      console.log('User signed up:', response.data);
+
+      // Show a success message
+      alert('Sign-up successful!');
+
+      // Optionally, you can redirect to another page or clear the form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+      });
+      setError(null); // Clear any previous errors
+    } catch (err) {
+      console.error('Error signing up:', err.response?.data || err.message);
+      // Set an error message
+      setError(err.response?.data?.message || 'An error occurred during sign-up.');
+    }
   };
 
   return (
@@ -87,6 +110,7 @@ const SignUp = () => {
           >
             Sign Up
           </button>
+          {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
           Already have an account?{' '}

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext'; // Import AuthContext
 
 const Header = () => {
@@ -48,7 +48,7 @@ const Header = () => {
                 </li>
                 <li>
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
                   >
                     Logout

@@ -11,6 +11,8 @@ const authenticateToken = require('./middleware/authenticateToken');
 const app = express();
 app.use(express.json());
 app.use(cors()); // Enable all CORS requests
+// Serve static files from the uploads directory
+app.use('/uploads', express.static('uploads'));
 
 // Import routes
 const productRoutes = require('./routes/products');

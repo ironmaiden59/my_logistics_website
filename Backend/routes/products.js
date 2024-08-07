@@ -1,11 +1,29 @@
 const express = require('express');
 const { Product } = require('../models');
-const authenticateToken = require('../middleware/authenticateToken'); // Middleware to authenticate JWT
+const authenticateToken = require('../middleware/authenticateToken');
+const multer = require('multer');
+const path = require('path');
+
 
 const router = express.Router();
 
+// Set up storage engine for Multer
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+// Initialize multer with storage engine
+const upload = multer({ storage });
+
 // Get all products for the authenticated user
 router.get('/', authenticateToken, async (req, res) => {
+  console.log('Authenticated user:', req.user); // Add logging to verify user
+
+  const { name, price, description } = req.body;
+  const imageUrl = req.file ? req.file.path : null;
   try {
     const products = await Product.findAll({ where: { userId: req.user.userId } });
     res.json(products);
@@ -15,16 +33,18 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Add a new product
-router.post('/', authenticateToken, async (req, res) => {
+// Add a new product with image upload
+router.post('/', authenticateToken, upload.single('image'), async (req, res) => {
   const { name, price, description } = req.body;
+  const imageUrl = req.file ? req.file.path : null;
 
   try {
     const product = await Product.create({
       name,
       price,
       description,
-      userId: req.user.userId
+      imageUrl, // Save the image URL
+      userId: req.user.userId,
     });
     res.status(201).json(product);
   } catch (error) {

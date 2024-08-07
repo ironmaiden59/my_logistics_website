@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '' });
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', image: null });
 
   useEffect(() => {
     fetchProducts();
@@ -26,15 +26,32 @@ const ProductManagement = () => {
     setNewProduct({ ...newProduct, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    setNewProduct({ ...newProduct, image: e.target.files[0] });
+  };
+
   const handleAddProduct = async (e) => {
     e.preventDefault();
+
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/products', newProduct, {
-        headers: { Authorization: `Bearer ${token}` },
+      const formData = new FormData();
+      formData.append('name', newProduct.name);
+      formData.append('price', newProduct.price);
+      formData.append('description', newProduct.description);
+      if (newProduct.image) {
+        formData.append('image', newProduct.image);
+      }
+
+      const response = await axios.post('http://localhost:5000/products', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
       setProducts([...products, response.data]);
-      setNewProduct({ name: '', price: '', description: '' });
+      setNewProduct({ name: '', price: '', description: '', image: null });
     } catch (err) {
       console.error('Error adding product:', err.response?.data || err.message);
     }
@@ -82,6 +99,13 @@ const ProductManagement = () => {
           required
           className="block mb-2 p-2 border border-gray-300 rounded"
         />
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="block mb-2 p-2 border border-gray-300 rounded"
+        />
         <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
           Add Product
         </button>
@@ -90,6 +114,7 @@ const ProductManagement = () => {
         {products.map((product) => (
           <li key={product.id} className="mb-4 p-4 border border-gray-300 rounded">
             <h3 className="text-lg font-bold">{product.name}</h3>
+            {product.imageUrl && <img src={`http://localhost:5000/${product.imageUrl}`} alt={product.name} className="w-32 h-32 mb-2"/>}
             <p>{product.description}</p>
             <p>${product.price}</p>
             <button

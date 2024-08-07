@@ -42,6 +42,11 @@ const Header = () => {
             {isAuthenticated ? (
               <>
                 <li>
+                  <Link to="/dashboard" className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                    Seller Dashboard
+                  </Link>
+                </li>
+                <li>
                   <Link to="/profile" className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                     Profile
                   </Link>

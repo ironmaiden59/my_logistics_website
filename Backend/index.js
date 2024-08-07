@@ -5,12 +5,18 @@ const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');
 const { User } = require('./models'); // Import User model
 const cors = require('cors');
-
+const authenticateToken = require('./middleware/authenticateToken');
 
 
 const app = express();
 app.use(express.json());
 app.use(cors()); // Enable all CORS requests
+
+// Import routes
+const productRoutes = require('./routes/products');
+const salesRoutes = require('./routes/sales');
+const deliveryRoutes = require('./routes/deliveries');
+const messageRoutes = require('./routes/messages');
 
 // Connect to PostgreSQL
 const sequelize = new Sequelize(
@@ -23,25 +29,17 @@ const sequelize = new Sequelize(
   }
 );
 
+
+  // Use routes
+app.use('/products', productRoutes);
+app.use('/sales', salesRoutes);
+app.use('/deliveries', deliveryRoutes);
+app.use('/messages', messageRoutes);
+
 // Test database connection
 sequelize.authenticate()
   .then(() => console.log('Database connected...'))
   .catch(err => console.log('Error: ' + err));
-
-// Middleware for authenticating token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-}
-
 
 // Routes
 

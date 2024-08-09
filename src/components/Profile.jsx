@@ -1,7 +1,7 @@
 import React from 'react';
 import UserInfoForm from './UserInfoForm';
 import PasswordManagement from './PasswordManagement';
-import PreferencesForm from './PreferencesForm';
+
 
 const Profile = () => {
   return (
@@ -10,7 +10,7 @@ const Profile = () => {
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Profile</h2>
         <UserInfoForm />
         <PasswordManagement />
-        <PreferencesForm />
+        
       </div>
     </div>
   );

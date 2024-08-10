@@ -106,48 +106,68 @@ const UserInfoForm = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Address
+          <label htmlFor="address1" className="block text-sm font-medium text-gray-700">
+            Address 1
           </label>
           <input
             type="text"
+            id="address1"
             name="address1"
             value={userInfo.address1}
             onChange={handleChange}
-            placeholder="Address 1"
-            className="block mb-2 p-2 border border-gray-300 rounded"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="address2" className="block text-sm font-medium text-gray-700">
+            Address 2
+          </label>
           <input
             type="text"
+            id="address2"
             name="address2"
             value={userInfo.address2}
             onChange={handleChange}
-            placeholder="Address 2"
-            className="block mb-2 p-2 border border-gray-300 rounded"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+            City or Town
+          </label>
           <input
             type="text"
+            id="city"
             name="city"
             value={userInfo.city}
             onChange={handleChange}
-            placeholder="City or Town"
-            className="block mb-2 p-2 border border-gray-300 rounded"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+            State/Province
+          </label>
           <input
             type="text"
+            id="state"
             name="state"
             value={userInfo.state}
             onChange={handleChange}
-            placeholder="State/Province"
-            className="block mb-2 p-2 border border-gray-300 rounded"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+            Zip Code/Postal Code
+          </label>
           <input
             type="text"
+            id="zipCode"
             name="zipCode"
             value={userInfo.zipCode}
             onChange={handleChange}
-            placeholder="Zip Code/Postal Code"
-            className="block mb-2 p-2 border border-gray-300 rounded"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <button

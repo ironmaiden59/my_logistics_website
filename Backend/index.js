@@ -116,7 +116,11 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      address: user.address || ''
+      address1: user.address1 || '',
+      address2: user.address2 || '',
+      city: user.city || '',
+      state: user.state || '',
+      zipCode: user.zipCode || ''
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);

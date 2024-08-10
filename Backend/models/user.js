@@ -15,22 +15,18 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
       allowNull: false,
       validate: {
-        isEmail: true
-      }
+        isEmail: true,
+      },
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    address: {
-      type: DataTypes.TEXT,
-      address1: DataTypes.STRING,
+    address1: DataTypes.STRING,
     address2: DataTypes.STRING,
     city: DataTypes.STRING,
     state: DataTypes.STRING,
     zipCode: DataTypes.STRING,
-    },
-    
   }, {
     sequelize,
     modelName: 'User',

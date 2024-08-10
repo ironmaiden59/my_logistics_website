@@ -16,16 +16,25 @@ const UserInfoForm = () => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    // Fetch user information from the backend
     const fetchUserInfo = async () => {
       try {
-        const token = localStorage.getItem('token'); // Get the stored token
+        const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:5000/user/profile', {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-        setUserInfo(response.data);
+
+        setUserInfo({
+          firstName: response.data.firstName || '',
+          lastName: response.data.lastName || '',
+          email: response.data.email || '',
+          address1: response.data.address1 || '',
+          address2: response.data.address2 || '',
+          city: response.data.city || '',
+          state: response.data.state || '',
+          zipCode: response.data.zipCode || '',
+        });
       } catch (err) {
         console.error('Error fetching user info:', err.response?.data || err.message);
         setMessage('Error fetching user information.');

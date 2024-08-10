@@ -24,16 +24,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     address: {
       type: DataTypes.TEXT,
-      defaultValue: '', // Default to an empty string if no address is provided
+      address1: DataTypes.STRING,
+    address2: DataTypes.STRING,
+    city: DataTypes.STRING,
+    state: DataTypes.STRING,
+    zipCode: DataTypes.STRING,
     },
-    receiveNotifications: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false, // Default to false for notifications
-    },
-    preferredDeliveryOption: {
-      type: DataTypes.STRING,
-      defaultValue: 'standard', // Default to 'standard' for delivery options
-    }
+    
   }, {
     sequelize,
     modelName: 'User',

@@ -125,7 +125,7 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
 });
 
 app.put('/user/profile', authenticateToken, async (req, res) => {
-  const { firstName, lastName, email, address } = req.body;
+  const { firstName, lastName, email, address1, address2, city, state, zipCode } = req.body;
 
   try {
     const user = await User.findByPk(req.user.userId);
@@ -133,7 +133,7 @@ app.put('/user/profile', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    await user.update({ firstName, lastName, email, address });
+    await user.update({ firstName, lastName, email, address1, address2, city, state, zipCode });
 
     res.status(200).json({ message: 'Profile updated successfully' });
   } catch (error) {

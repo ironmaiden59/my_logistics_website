@@ -6,7 +6,11 @@ const UserInfoForm = () => {
     firstName: '',
     lastName: '',
     email: '',
-    address: ''
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zipCode: '',
   });
 
   const [message, setMessage] = useState(null);
@@ -105,12 +109,45 @@ const UserInfoForm = () => {
           <label htmlFor="address" className="block text-sm font-medium text-gray-700">
             Address
           </label>
-          <textarea
-            id="address"
-            name="address"
-            value={userInfo.address}
+          <input
+            type="text"
+            name="address1"
+            value={userInfo.address1}
             onChange={handleChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Address 1"
+            className="block mb-2 p-2 border border-gray-300 rounded"
+          />
+          <input
+            type="text"
+            name="address2"
+            value={userInfo.address2}
+            onChange={handleChange}
+            placeholder="Address 2"
+            className="block mb-2 p-2 border border-gray-300 rounded"
+          />
+          <input
+            type="text"
+            name="city"
+            value={userInfo.city}
+            onChange={handleChange}
+            placeholder="City or Town"
+            className="block mb-2 p-2 border border-gray-300 rounded"
+          />
+          <input
+            type="text"
+            name="state"
+            value={userInfo.state}
+            onChange={handleChange}
+            placeholder="State/Province"
+            className="block mb-2 p-2 border border-gray-300 rounded"
+          />
+          <input
+            type="text"
+            name="zipCode"
+            value={userInfo.zipCode}
+            onChange={handleChange}
+            placeholder="Zip Code/Postal Code"
+            className="block mb-2 p-2 border border-gray-300 rounded"
           />
         </div>
         <button

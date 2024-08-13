@@ -53,6 +53,23 @@ router.post('/', authenticateToken, upload.single('image'), async (req, res) => 
   }
 });
 
+// Get a single product by ID
+router.get('/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findOne({ where: { id, userId: req.user.userId } });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update a product
 router.put('/:id', authenticateToken, upload.single('image'), async (req, res) => {
   const { id } = req.params;

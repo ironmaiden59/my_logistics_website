@@ -11,6 +11,7 @@ import SignUp from './components/SignUp';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import SellerDashboard from './components/SellerDashboard';
+import ProductManagement from './components/ProductManagement';
 import './styles/styles.css'; 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<SellerDashboard />} />
+          <Route path="/products" element={<ProductManagement />} />
         </Routes>
         <Footer />
       </div>

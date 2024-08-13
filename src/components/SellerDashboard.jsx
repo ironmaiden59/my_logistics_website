@@ -1,5 +1,4 @@
 import React from 'react';
-import ProductManagement from './ProductManagement';
 import SalesOverview from './SalesOverview';
 import DeliveryTracking from './DeliveryTracking';
 import MessagesComponent from './MessagesComponent';

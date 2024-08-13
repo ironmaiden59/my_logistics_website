@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -153,12 +154,20 @@ const ProductManagement = () => {
             )}
             <p className="text-gray-600">{product.description}</p>
             <p className="text-blue-600 font-bold mt-2">${product.price}</p>
-            <button
-              onClick={() => handleDeleteProduct(product.id)}
-              className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Delete
-            </button>
+            <div className="flex justify-between mt-4">
+              <Link
+                to={`/products/edit/${product.id}`}
+                className="bg-yellow-600 text-white py-1 px-3 rounded hover:bg-yellow-700 transition-colors"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={() => handleDeleteProduct(product.id)}
+                className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>

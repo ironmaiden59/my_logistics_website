@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
 import Profile from './components/Profile';
+import EditProduct from './components/EditProduct';
 import SellerDashboard from './components/SellerDashboard';
 import ProductManagement from './components/ProductManagement';
 import './styles/styles.css'; 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<SellerDashboard />} />
           <Route path="/products" element={<ProductManagement />} />
+          <Route path="/products/edit/:id" element={<EditProduct />} />
         </Routes>
         <Footer />
       </div>

@@ -53,6 +53,36 @@ router.post('/', authenticateToken, upload.single('image'), async (req, res) => 
   }
 });
 
+// Update a product
+router.put('/:id', authenticateToken, upload.single('image'), async (req, res) => {
+  const { id } = req.params;
+  const { name, price, description } = req.body;
+  const imageUrl = req.file ? req.file.path : null;
+
+  try {
+    const product = await Product.findOne({ where: { id, userId: req.user.userId } });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Update product details
+    product.name = name || product.name;
+    product.price = price || product.price;
+    product.description = description || product.description;
+    
+    // Update the image if a new one was uploaded
+    if (imageUrl) {
+      product.imageUrl = imageUrl;
+    }
+
+    await product.save();
+    res.json({ message: 'Product updated successfully', product });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Delete a product
 router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;

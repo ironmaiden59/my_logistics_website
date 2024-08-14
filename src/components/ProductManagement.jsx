@@ -13,6 +13,7 @@ const ProductManagement = () => {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem('token');
+      
       const response = await axios.get('http://localhost:5000/products', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -36,6 +37,7 @@ const ProductManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
+      console.log('Token:', token);
       const formData = new FormData();
       formData.append('name', newProduct.name);
       formData.append('price', newProduct.price);
@@ -150,7 +152,7 @@ const ProductManagement = () => {
               <img
                 key={index}
                 src={`http://localhost:5000/${image}`}
-                alt={`${product.name} - Image ${index + 1}`}
+                alt={`${product.name} - ${index + 1}`}
                 className="w-full h-32 object-cover mb-2 rounded"
               />
             ))}

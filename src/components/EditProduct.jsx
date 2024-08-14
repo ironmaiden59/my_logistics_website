@@ -27,7 +27,7 @@ const EditProduct = () => {
         if (!productData.images) {
           productData.images = [];
         }
-        console.log('Fetched product images:', productData.images);
+        
         setProduct(productData);
       } catch (err) {
         console.error('Error fetching product:', err.response?.data || err.message);

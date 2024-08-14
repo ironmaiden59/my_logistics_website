@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', image: null });
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', images: [] });
 
   useEffect(() => {
     fetchProducts();
@@ -28,7 +28,7 @@ const ProductManagement = () => {
   };
 
   const handleImageChange = (e) => {
-    setNewProduct({ ...newProduct, image: e.target.files[0] });
+    setNewProduct({ ...newProduct, images: e.target.files });
   };
 
   const handleAddProduct = async (e) => {
@@ -40,9 +40,9 @@ const ProductManagement = () => {
       formData.append('name', newProduct.name);
       formData.append('price', newProduct.price);
       formData.append('description', newProduct.description);
-      if (newProduct.image) {
-        formData.append('image', newProduct.image);
-      }
+      Array.from(newProduct.images).forEach((image) => {
+        formData.append('images', image);
+      });
 
       const response = await axios.post('http://localhost:5000/products', formData, {
         headers: {
@@ -52,7 +52,7 @@ const ProductManagement = () => {
       });
 
       setProducts([...products, response.data]);
-      setNewProduct({ name: '', price: '', description: '', image: null });
+      setNewProduct({ name: '', price: '', description: '', images: [] });
     } catch (err) {
       console.error('Error adding product:', err.response?.data || err.message);
     }
@@ -121,14 +121,15 @@ const ProductManagement = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-            Product Image
+          <label htmlFor="images" className="block text-sm font-medium text-gray-700">
+            Product Images
           </label>
           <input
             type="file"
-            id="image"
-            name="image"
+            id="images"
+            name="images"
             accept="image/*"
+            multiple
             onChange={handleImageChange}
             className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
@@ -145,13 +146,14 @@ const ProductManagement = () => {
         {products.map((product) => (
           <div key={product.id} className="bg-white p-4 rounded-lg shadow-md">
             <h3 className="text-lg font-bold mb-2 text-gray-800">{product.name}</h3>
-            {product.imageUrl && (
+            {product.images && product.images.map((image, index) => (
               <img
-                src={`http://localhost:5000/${product.imageUrl}`}
-                alt={product.name}
+                key={index}
+                src={`http://localhost:5000/${image}`}
+                alt={`${product.name} - Image ${index + 1}`}
                 className="w-full h-32 object-cover mb-2 rounded"
               />
-            )}
+            ))}
             <p className="text-gray-600">{product.description}</p>
             <p className="text-blue-600 font-bold mt-2">${product.price}</p>
             <div className="flex justify-between mt-4">

@@ -20,10 +20,6 @@ const upload = multer({ storage }).array('images', 10); // Allow up to 10 images
 
 // Get all products for the authenticated user
 router.get('/', authenticateToken, async (req, res) => {
-  console.log('Authenticated user:', req.user); // Add logging to verify user
-
-  const { name, price, description } = req.body;
-  const imageUrl = req.file ? req.file.path : null;
   try {
     const products = await Product.findAll({ where: { userId: req.user.userId } });
     res.json(products);
@@ -33,17 +29,17 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Add a new product with image upload
-router.post('/', authenticateToken, upload.single('image'), async (req, res) => {
+// Add a new product with multiple images
+router.post('/', authenticateToken, upload, async (req, res) => {
   const { name, price, description } = req.body;
-  const imageUrl = req.file ? req.file.path : null;
+  const imageUrls = req.files.map(file => file.path); // Store paths of all uploaded images
 
   try {
     const product = await Product.create({
       name,
       price,
       description,
-      imageUrl, // Save the image URL
+      images: imageUrls, // Store array of image URLs
       userId: req.user.userId,
     });
     res.status(201).json(product);
@@ -63,11 +59,9 @@ router.get('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Modify image URL to serve it correctly
+    // Modify image URLs to serve them correctly
     const productData = product.toJSON();
-    if (productData.imageUrl) {
-      productData.imageUrl = productData.imageUrl.replace('uploads/', '/uploads/');
-    }
+    productData.images = productData.images.map(imageUrl => imageUrl.replace('uploads/', '/uploads/'));
 
     res.json(productData);
   } catch (error) {
@@ -76,11 +70,11 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Update a product
-router.put('/:id', authenticateToken, upload.single('image'), async (req, res) => {
+// Update a product with multiple image uploads
+router.put('/:id', authenticateToken, upload, async (req, res) => {
   const { id } = req.params;
   const { name, price, description } = req.body;
-  const imageUrl = req.file ? req.file.path : null;
+  const imageUrls = req.files.map(file => file.path);
 
   try {
     const product = await Product.findOne({ where: { id, userId: req.user.userId } });
@@ -92,10 +86,9 @@ router.put('/:id', authenticateToken, upload.single('image'), async (req, res) =
     product.name = name || product.name;
     product.price = price || product.price;
     product.description = description || product.description;
-    
-    // Update the image if a new one was uploaded
-    if (imageUrl) {
-      product.imageUrl = imageUrl;
+
+    if (imageUrls.length > 0) {
+      product.images = imageUrls; // Replace existing images with new ones
     }
 
     await product.save();

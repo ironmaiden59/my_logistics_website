@@ -15,8 +15,8 @@ const storage = multer.diskStorage({
   }
 });
 
-// Initialize multer with storage engine
-const upload = multer({ storage });
+// Set up multer to handle multiple images
+const upload = multer({ storage }).array('images', 10); // Allow up to 10 images
 
 // Get all products for the authenticated user
 router.get('/', authenticateToken, async (req, res) => {
@@ -63,7 +63,13 @@ router.get('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    res.json(product);
+    // Modify image URL to serve it correctly
+    const productData = product.toJSON();
+    if (productData.imageUrl) {
+      productData.imageUrl = productData.imageUrl.replace('uploads/', '/uploads/');
+    }
+
+    res.json(productData);
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ message: 'Server error' });

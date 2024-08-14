@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     price: DataTypes.DECIMAL,
     description: DataTypes.TEXT,
-    imageUrl: DataTypes.STRING,
+    images: {
+      type: DataTypes.ARRAY(DataTypes.STRING), // Store multiple image URLs
+      allowNull: true,
+    },
     userId: DataTypes.INTEGER
   }, {
     sequelize,

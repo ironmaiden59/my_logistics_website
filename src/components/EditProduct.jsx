@@ -9,7 +9,7 @@ const EditProduct = () => {
     name: '',
     price: '',
     description: '',
-    images: []
+    images: [] // Initialize images as an empty array
   });
   const [newImages, setNewImages] = useState([]);
 
@@ -21,7 +21,14 @@ const EditProduct = () => {
         const response = await axios.get(`http://localhost:5000/products/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setProduct(response.data);
+        const productData = response.data;
+        
+        // Ensure images is always an array
+        if (!productData.images) {
+          productData.images = [];
+        }
+        console.log('Fetched product images:', productData.images);
+        setProduct(productData);
       } catch (err) {
         console.error('Error fetching product:', err.response?.data || err.message);
       }
@@ -59,7 +66,7 @@ const EditProduct = () => {
         },
       });
 
-      navigate('/product-management'); // Redirect to product management page
+      navigate('/products'); // Redirect to product management page
     } catch (err) {
       console.error('Error saving product changes:', err.response?.data || err.message);
     }
@@ -110,6 +117,23 @@ const EditProduct = () => {
             className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
+        {product.images.length > 0 && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Current Images
+            </label>
+            <div className="flex flex-wrap mt-1">
+              {product.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={`http://localhost:5000/${image}`}
+                  alt={`Product ${product.name} - Image ${index + 1}`}
+                  className="w-24 h-24 object-cover mr-2 mb-2 rounded"
+                />
+              ))}
+            </div>
+          </div>
+        )}
         <div className="mb-4">
           <label htmlFor="images" className="block text-sm font-medium text-gray-700">
             Add Images

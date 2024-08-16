@@ -127,7 +127,7 @@ const EditProduct = () => {
                 <img
                   key={index}
                   src={`http://localhost:5000/${image}`}
-                  alt={`Product ${product.name} - Image ${index + 1}`}
+                  alt={`Product ${product.name} - ${index + 1}`}
                   className="w-24 h-24 object-cover mr-2 mb-2 rounded"
                 />
               ))}

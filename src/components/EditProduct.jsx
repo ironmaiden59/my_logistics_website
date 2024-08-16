@@ -22,7 +22,7 @@ const EditProduct = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const productData = response.data;
-        
+        console.log('Fetched product data:', productData);
         // Ensure images is always an array
         if (!productData.images) {
           productData.images = [];
@@ -123,13 +123,13 @@ const EditProduct = () => {
               Current Images
             </label>
             <div className="flex flex-wrap mt-1">
-              {product.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={`http://localhost:5000/${image}`}
-                  alt={`Product ${product.name} - ${index + 1}`}
-                  className="w-24 h-24 object-cover mr-2 mb-2 rounded"
-                />
+            {product.images && product.images.map((image, index) => (
+  <img
+    key={index}
+    src={`http://localhost:5000${image}`}
+    alt={`${product.name} - ${index + 1}`}
+    className="w-full h-32 object-cover mb-2 rounded"
+  />
               ))}
             </div>
           </div>

@@ -37,7 +37,7 @@ const ProductManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
-      console.log('Token:', token);
+      
       const formData = new FormData();
       formData.append('name', newProduct.name);
       formData.append('price', newProduct.price);

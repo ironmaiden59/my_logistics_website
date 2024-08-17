@@ -5,6 +5,7 @@ const BuyItem = () => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
+    // Fetch items from the backend
     const fetchItems = async () => {
       try {
         const response = await axios.get('http://localhost:5000/items');

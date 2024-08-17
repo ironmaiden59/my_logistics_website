@@ -26,4 +26,23 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Add a new item (used by the Chrome extension)
+router.post('/', async (req, res) => {
+  let { name, price } = req.body;
+
+  // Ensure the price is numeric
+  price = parseFloat(price);
+  if (isNaN(price)) {
+    return res.status(400).json({ message: 'Invalid price format' });
+  }
+
+  try {
+    const item = await Item.create({ name, price });
+    res.status(201).json(item);
+  } catch (error) {
+    console.error('Error adding item:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

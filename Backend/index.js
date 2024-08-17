@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');
 const { User } = require('./models'); // Import User model
+const itemRoutes = require('./routes/items');
 const cors = require('cors');
 const authenticateToken = require('./middleware/authenticateToken');
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors()); // Enable all CORS requests
 // Serve static files from the uploads directory
 app.use('/uploads', express.static('uploads'));
+app.use('/items', itemRoutes);
 
 // Import routes
 const productRoutes = require('./routes/products');

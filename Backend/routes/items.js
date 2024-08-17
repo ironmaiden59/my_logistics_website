@@ -45,4 +45,22 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Delete an item by ID
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const item = await Item.findByPk(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    await item.destroy();
+    res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

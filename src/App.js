@@ -12,6 +12,7 @@ import Login from './components/Login';
 import Profile from './components/Profile';
 import EditProduct from './components/EditProduct';
 import BuyItem from './components/BuyItem';
+import ItemDetail from './components/ItemDetail';
 import SellerDashboard from './components/SellerDashboard';
 import ProductManagement from './components/ProductManagement';
 import './styles/styles.css'; 

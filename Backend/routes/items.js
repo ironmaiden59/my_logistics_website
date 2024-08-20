@@ -45,6 +45,20 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Get a single item by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const item = await Item.findByPk(req.params.id);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    res.json(item);
+  } catch (error) {
+    console.error('Error fetching item:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Delete an item by ID
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;

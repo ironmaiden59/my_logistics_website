@@ -32,8 +32,10 @@ const BuyItem = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {items.map((item, index) => (
           <div key={index} className="bg-white p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-bold mb-2 text-gray-800">{item.name}</h3>
-            <p className="text-blue-600 font-bold mt-2">${item.price}</p>
+            <Link to={`/items/${item.id}`}>
+              <h3 className="text-lg font-bold mb-2 text-gray-800">{item.name}</h3>
+              <p className="text-blue-600 font-bold mt-2">${item.price}</p>
+            </Link>
             {item.id && (
               <button
                 onClick={() => handleDelete(item.id)}

@@ -6,7 +6,7 @@ import Hero from './components/Hero';
 import Features from './components/Features';
 import HowItWorks from './components/HowitWorks';
 import Contact from './components/Contact';
-import Footer from './components/Footer';
+// import Footer from './components/Footer';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
 import Profile from './components/Profile';

@@ -6,6 +6,7 @@ const { Sequelize } = require('sequelize');
 const { User } = require('./models'); // Import User model
 const itemRoutes = require('./routes/items');
 const cors = require('cors');
+const messageRoutes = require('./routes/messages');
 const authenticateToken = require('./middleware/authenticateToken');
 
 
@@ -15,6 +16,7 @@ app.use(cors()); // Enable all CORS requests
 // Serve static files from the uploads directory
 app.use('/uploads', express.static('uploads'));
 app.use('/items', itemRoutes);
+app.use('/messages', messageRoutes);
 
 // Import routes
 const productRoutes = require('./routes/products');

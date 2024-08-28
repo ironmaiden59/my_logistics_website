@@ -22,7 +22,7 @@ app.use('/messages', messageRoutes);
 const productRoutes = require('./routes/products');
 const salesRoutes = require('./routes/sales');
 const deliveryRoutes = require('./routes/deliveries');
-const messageRoutes = require('./routes/messages');
+
 
 // Connect to PostgreSQL
 const sequelize = new Sequelize(

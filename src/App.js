@@ -15,6 +15,7 @@ import BuyItem from './components/BuyItem';
 import ItemDetail from './components/ItemDetail';
 import SellerDashboard from './components/SellerDashboard';
 import ProductManagement from './components/ProductManagement';
+import RespondToBuyer from './components/RespondToBuyer';
 import './styles/styles.css'; 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path="/buy-item" element={<BuyItem />} />
           <Route path="/products" element={<ProductManagement />} />
           <Route path="/products/edit/:id" element={<EditProduct />} />
+          <Route path="/respond-to-buyer/:id" element={<RespondToBuyer />} />
         </Routes>
         {/* <Footer /> */} 
       </div>

@@ -5,10 +5,11 @@ const router = express.Router();
 // Get messages for a specific item
 router.get('/item/:itemId', async (req, res) => {
   try {
+    console.log('Fetching messages for item:', req.params.itemId);
     const messages = await Message.findAll({ where: { itemId: req.params.itemId } });
     res.json(messages);
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    console.error('Error fetching messages for item', req.params.itemId, ':', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

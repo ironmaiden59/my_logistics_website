@@ -5,23 +5,49 @@ import axios from 'axios';
 const ItemDetail = () => {
   const { id } = useParams(); // Get the item ID from the URL
   const [item, setItem] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
 
   useEffect(() => {
-    const fetchItem = async () => {
+    const fetchItemAndMessages = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/items/${id}`);
         setItem(response.data);
         
+        // Fetch messages
+        const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
+        setMessages(messagesResponse.data);
+
         // Generate a unique link for the seller
         setGeneratedLink(`http://localhost:3000/respond-to-buyer/${id}`);
       } catch (err) {
-        console.error('Error fetching item:', err.response?.data || err.message);
+        console.error('Error fetching item or messages:', err.response?.data || err.message);
       }
     };
 
-    fetchItem();
+    fetchItemAndMessages();
   }, [id]);
+
+  const handleMessageSend = async () => {
+    try {
+      // Assuming the buyerId is the current user ID (replace with actual buyerId logic)
+      const buyerId = 1; // Replace with actual buyerId
+      await axios.post('http://localhost:5000/messages', {
+        content: newMessage,
+        senderId: buyerId, // Buyer is the sender
+        receiverId: item.userId, // Seller is the receiver
+        itemId: id,
+      });
+      setNewMessage('');
+
+      // Fetch updated messages
+      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
+      setMessages(messagesResponse.data);
+    } catch (err) {
+      console.error('Error sending message:', err.response?.data || err.message);
+    }
+  };
 
   if (!item) {
     return <p>Loading...</p>;
@@ -37,6 +63,29 @@ const ItemDetail = () => {
           Fee: $15.99 | Total: ${(parseFloat(item.price) + 15.99).toFixed(2)}
         </p>
       )}
+
+      <div className="messages mt-8">
+        <h3 className="text-2xl font-bold mb-4">Messages</h3>
+        <div className="message-list mb-4">
+          {messages.map((message, index) => (
+            <div key={index} className="bg-gray-100 p-4 rounded-lg mb-2">
+              <p>{message.content}</p>
+            </div>
+          ))}
+        </div>
+        <textarea
+          className="w-full p-3 border border-gray-300 rounded-lg"
+          placeholder="Write a message..."
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+        ></textarea>
+        <button
+          className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={handleMessageSend}
+        >
+          Send Message
+        </button>
+      </div>
 
       <div className="mt-8 text-center">
         <p>Copy and send this link to the seller:</p>

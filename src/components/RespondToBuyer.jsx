@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const RespondToBuyer = () => {
   const { id } = useParams(); // Get the item ID from the URL
+  const location = useLocation();
   const [item, setItem] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+
+  // Extract buyerId from the query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const buyerId = queryParams.get('buyerId');
 
   useEffect(() => {
     const fetchItemAndMessages = async () => {
       try {
         const itemResponse = await axios.get(`http://localhost:5000/items/${id}`);
+        console.log('Item data:', itemResponse.data); // Debugging line
         setItem(itemResponse.data);
 
         const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
@@ -26,14 +32,17 @@ const RespondToBuyer = () => {
 
   const handleMessageSend = async () => {
     try {
-      // Assuming you have the buyerId (could be passed as a parameter or stored in a session)
-      const buyerId = 1; // Replace with actual buyerId
+      // Ensure you have the correct sellerId (which is the userId of the item owner)
+      const sellerId = item.userId;
+      console.log('Seller ID:', sellerId); // Debugging line
+
       await axios.post('http://localhost:5000/messages', {
         content: newMessage,
-        senderId: item.userId, // Seller is the sender
+        senderId: sellerId, // Seller is the sender
         receiverId: buyerId, // Buyer is the receiver
         itemId: id,
       });
+
       setNewMessage('');
 
       // Fetch updated messages

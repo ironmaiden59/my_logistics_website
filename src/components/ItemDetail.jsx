@@ -14,18 +14,17 @@ const ItemDetail = () => {
       try {
         const response = await axios.get(`http://localhost:5000/items/${id}`);
         setItem(response.data);
+  
+        // Assuming the buyerId is available from the user's session or context
+        const buyerId = 1; // Replace this with the actual logic to get the buyerId
         
-        // Fetch messages
-        const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
-        setMessages(messagesResponse.data);
-
-        // Generate a unique link for the seller
-        setGeneratedLink(`http://localhost:3000/respond-to-buyer/${id}`);
+        // Generate a unique link for the seller with buyerId in the query params
+        setGeneratedLink(`http://localhost:3000/respond-to-buyer/${id}?buyerId=${buyerId}`);
       } catch (err) {
         console.error('Error fetching item or messages:', err.response?.data || err.message);
       }
     };
-
+  
     fetchItemAndMessages();
   }, [id]);
 

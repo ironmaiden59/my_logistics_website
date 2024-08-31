@@ -9,21 +9,32 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       content: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       senderId: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'Users', // assuming you have a Users table
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
       },
       receiverId: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'Users', // assuming you have a Users table
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
       },
       itemId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Items', // name of the Items table
+          model: 'Items', // assuming you have an Items table
           key: 'id'
         },
         onDelete: 'CASCADE'

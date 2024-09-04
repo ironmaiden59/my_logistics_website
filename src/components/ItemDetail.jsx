@@ -4,44 +4,52 @@ import axios from 'axios';
 
 const ItemDetail = () => {
   const { id } = useParams(); // Get the item ID from the URL
-  const [item, setItem] = useState(null);
+  const [item, setItem] = useState(null); // Fetch the item here
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
 
-  // Fetch messages for the item
-useEffect(() => {
-  const fetchMessages = async () => {
+  useEffect(() => {
+    const fetchItemAndMessages = async () => {
+      try {
+        // Fetch item by ID
+        const itemResponse = await axios.get(`http://localhost:5000/items/${id}`);
+        setItem(itemResponse.data); // Store item in state
+
+        // Fetch messages related to the item
+        const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
+        setMessages(messagesResponse.data);
+
+        // Assuming the buyerId is available from the user's session or context
+        const buyerId = 1; // Replace this with actual buyerId logic
+        setGeneratedLink(`http://localhost:3000/respond-to-buyer/${id}?buyerId=${buyerId}`);
+      } catch (err) {
+        console.error('Error fetching item or messages:', err.response?.data || err.message);
+      }
+    };
+
+    fetchItemAndMessages();
+  }, [id]);
+
+  // Send new message
+  const handleMessageSend = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/messages/item/${id}`);
-      setMessages(response.data);
+      const buyerId = 1; // Replace with actual buyerId
+      await axios.post('http://localhost:5000/messages', {
+        content: newMessage,
+        senderId: buyerId, // Buyer as the sender
+        receiverId: item.userId, // Seller as the receiver
+        itemId: id,
+      });
+      setNewMessage('');
+
+      // Fetch updated messages
+      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
+      setMessages(messagesResponse.data);
     } catch (err) {
-      console.error('Error fetching messages:', err.response?.data || err.message);
+      console.error('Error sending message:', err.response?.data || err.message);
     }
   };
-
-  fetchMessages();
-}, [id]);
-
-// Send new message
-const handleMessageSend = async () => {
-  try {
-    const buyerId = 1; // Replace with actual buyerId
-    await axios.post('http://localhost:5000/messages', {
-      content: newMessage,
-      senderId: buyerId, // Buyer as the sender
-      receiverId: item.userId, // Seller as the receiver
-      itemId: id,
-    });
-    setNewMessage('');
-
-    // Fetch updated messages
-    const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
-    setMessages(messagesResponse.data);
-  } catch (err) {
-    console.error('Error sending message:', err.response?.data || err.message);
-  }
-};
 
   if (!item) {
     return <p>Loading...</p>;

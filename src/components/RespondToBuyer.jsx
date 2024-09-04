@@ -16,33 +16,36 @@ const RespondToBuyer = () => {
   useEffect(() => {
     const fetchItemAndMessages = async () => {
       try {
-        // Fetch the item by ID
         const itemResponse = await axios.get(`http://localhost:5000/items/${id}`);
-        setItem(itemResponse.data); // Store the item in state
-
-        // Fetch messages related to the item
+        setItem(itemResponse.data); // Set the item data here
+  
         const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
         setMessages(messagesResponse.data);
       } catch (err) {
         console.error('Error fetching item or messages:', err.response?.data || err.message);
       }
     };
-
+  
     fetchItemAndMessages();
   }, [id]);
 
   // Send new message
   const handleMessageSend = async () => {
+    if (!item || !item.userId) {
+      console.error('Item or seller information is not available.');
+      return;
+    }
+  
     try {
       const sellerId = item.userId; // Seller as the sender
       await axios.post('http://localhost:5000/messages', {
         content: newMessage,
-        senderId: sellerId,
+        senderId: sellerId, // Use the sellerId here
         receiverId: buyerId, // Buyer as the receiver
         itemId: id,
       });
       setNewMessage('');
-
+  
       // Fetch updated messages
       const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
       setMessages(messagesResponse.data);

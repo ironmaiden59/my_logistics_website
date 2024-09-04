@@ -22,6 +22,11 @@ router.get('/item/:itemId', async (req, res) => {
 router.post('/', async (req, res) => {
   const { content, senderId, receiverId, itemId } = req.body;
 
+  // Validate that all required fields are present
+  if (!content || !senderId || !receiverId || !itemId) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
   try {
     const newMessage = await Message.create({
       content,

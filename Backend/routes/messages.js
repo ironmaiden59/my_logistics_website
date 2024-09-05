@@ -1,4 +1,5 @@
 const express = require('express');
+const { Token, Item } = require('../models');
 const { Message } = require('../models');
 const router = express.Router();
 
@@ -38,6 +39,27 @@ router.post('/', async (req, res) => {
     res.status(201).json(newMessage);
   } catch (error) {
     console.error('Error sending message:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Validate the token when seller clicks the link
+router.post('/validate-token', async (req, res) => {
+  const { token } = req.body;
+
+  console.log('Received token:', token); // Debugging
+
+  try {
+    // Find the token in the database
+    const validToken = await Token.findOne({ where: { token }, include: [Item] });
+
+    if (validToken) {
+      res.json({ valid: true, item: validToken.Item });
+    } else {
+      res.status(401).json({ valid: false, message: 'Invalid token' });
+    }
+  } catch (error) {
+    console.error('Error validating token:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

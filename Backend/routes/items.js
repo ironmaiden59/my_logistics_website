@@ -1,6 +1,27 @@
 const express = require('express');
-const { Item } = require('../models');
+const crypto = require('crypto');
+const { Token, Item, User } = require('../models'); // Import both Item and User models
 const router = express.Router();
+
+// Generate a unique token and send a link to the seller
+router.get('/:id/generate-link', async (req, res) => {
+  const { id } = req.params;
+  const buyerId = req.session.userId; // Assuming the buyer is logged in
+
+  try {
+    // Generate a unique token for temporary access
+    const token = crypto.randomBytes(20).toString('hex');
+
+    // Store the token along with the itemId and buyerId
+    await Token.create({ token, itemId: id, buyerId });
+
+    // Send the generated link back to the frontend
+    res.json({ link: `http://localhost:3000/respond-to-buyer/${id}?token=${token}` });
+  } catch (error) {
+    console.error('Error generating token:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // Get all items
 router.get('/', async (req, res) => {
@@ -9,19 +30,6 @@ router.get('/', async (req, res) => {
     res.json(items);
   } catch (error) {
     console.error('Error fetching items:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Add a new item (used by the Chrome extension)
-router.post('/', async (req, res) => {
-  const { name, price } = req.body;
-
-  try {
-    const item = await Item.create({ name, price });
-    res.status(201).json(item);
-  } catch (error) {
-    console.error('Error adding item:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -45,13 +53,23 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get a single item by ID
+// Get a single item by ID, including seller (user) info
 router.get('/:id', async (req, res) => {
   try {
-    const item = await Item.findByPk(req.params.id);
+    const item = await Item.findByPk(req.params.id, {
+      include: [
+        {
+          model: User, 
+          as: 'seller', 
+          attributes: ['id', 'firstName', 'lastName', 'email'] // Use firstName and lastName instead of name
+        }
+      ]
+    });
+
     if (!item) {
       return res.status(404).json({ message: 'Item not found' });
     }
+
     res.json(item);
   } catch (error) {
     console.error('Error fetching item:', error);

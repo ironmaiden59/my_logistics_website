@@ -22,7 +22,20 @@ const ItemDetail = () => {
 
         // Assuming the buyerId is available from the user's session or context
         const buyerId = 1; // Replace this with actual buyerId logic
-        setGeneratedLink(`http://localhost:3000/respond-to-buyer/${id}?buyerId=${buyerId}`);
+
+        // Fetch JWT token from local storage (or wherever you're storing it)
+        const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+
+        // Generate a tokenized link using JWT
+        const linkResponse = await axios.get(`http://localhost:5000/items/${id}/generate-link`, {
+          headers: {
+            'Authorization': `Bearer ${token}` // Include the JWT
+          }
+        });
+
+        // Set the generated link in state
+        setGeneratedLink(linkResponse.data.link);
+
       } catch (err) {
         console.error('Error fetching item or messages:', err.response?.data || err.message);
       }

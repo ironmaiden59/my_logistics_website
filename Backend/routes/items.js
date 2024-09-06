@@ -2,11 +2,12 @@ const express = require('express');
 const crypto = require('crypto');
 const { Token, Item, User } = require('../models'); // Import both Item and User models
 const router = express.Router();
+const authenticateToken = require('../middleware/authenticateToken');
 
 // Generate a unique token and send a link to the seller
-router.get('/:id/generate-link', async (req, res) => {
+router.get('/:id/generate-link', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const buyerId = req.session.userId; // Assuming the buyer is logged in
+  const buyerId = req.user.userId; // JWT decoded userId
 
   console.log('Generating link for item:', id, 'by buyer:', buyerId); // Debugging log
 

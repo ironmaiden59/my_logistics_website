@@ -44,11 +44,14 @@ const RespondToBuyer = () => {
       console.error('Item information is not available.');
       return;
     }
+    const buyerId = 1;
 
     try {
       await axios.post('http://localhost:5000/messages', {
         content: newMessage,
         itemId: item.id,
+        senderId: buyerId, // Provide senderId
+      receiverId: item.userId, // Provide receiverId (seller's userId)
         token, // Send the token along with the message
       });
       setNewMessage('');

@@ -46,6 +46,7 @@ const ItemDetail = () => {
 
   // Send new message
   const handleMessageSend = async () => {
+    const buyerId = 1;
     try {
       const buyerId = 1; // Replace with actual buyerId
       await axios.post('http://localhost:5000/messages', {

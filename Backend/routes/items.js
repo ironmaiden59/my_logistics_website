@@ -8,6 +8,12 @@ router.get('/:id/generate-link', async (req, res) => {
   const { id } = req.params;
   const buyerId = req.session.userId; // Assuming the buyer is logged in
 
+  console.log('Generating link for item:', id, 'by buyer:', buyerId); // Debugging log
+
+  if (!buyerId) {
+    return res.status(401).json({ message: 'Unauthorized: Buyer must be logged in.' });
+  }
+
   try {
     // Generate a unique token for temporary access
     const token = crypto.randomBytes(20).toString('hex');

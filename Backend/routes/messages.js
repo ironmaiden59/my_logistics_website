@@ -47,7 +47,8 @@ router.post('/', async (req, res) => {
 router.post('/validate-token', async (req, res) => {
   const { token } = req.body;
 
-  console.log('Received token:', token); // Debugging
+  // Debugging: Log the received token
+  console.log('Received token for validation:', token);
 
   try {
     // Find the token in the database

@@ -43,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id',
       },
     },
+  date: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW, // Automatically set the current timestamp
+  },
   }, {
     sequelize,
     modelName: 'Message',

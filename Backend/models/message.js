@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    senderName: {
+      type: DataTypes.STRING,
+      allowNull: true, // Allow null in case the seller is not logged in
+    },
     senderId: {
       type: DataTypes.INTEGER,
       allowNull: false,

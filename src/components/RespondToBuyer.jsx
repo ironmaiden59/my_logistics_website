@@ -7,6 +7,7 @@ const RespondToBuyer = () => {
   const location = useLocation();
   const navigate = useNavigate(); // For redirecting
   const [item, setItem] = useState(null);
+  const [senderName, setSenderName] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isValidToken, setIsValidToken] = useState(false);
@@ -51,6 +52,7 @@ const RespondToBuyer = () => {
       await axios.post('http://localhost:5000/messages', {
         content: newMessage,
         itemId: item.id,
+        senderName: senderName || 'Anonymous', // Default to 'Anonymous' if no name is provided
         senderId: buyerId, // Provide senderId (the buyer)
         receiverId: item.userId, // Provide receiverId (the seller's userId)
         token, // Send the token along with the message
@@ -83,6 +85,12 @@ const RespondToBuyer = () => {
             </div>
           ))}
         </div>
+        <textarea
+  className="w-full p-3 border border-gray-300 rounded-lg"
+  placeholder="Enter your name"
+  value={senderName}
+  onChange={(e) => setSenderName(e.target.value)}
+></textarea>
         <textarea
           className="w-full p-3 border border-gray-300 rounded-lg"
           placeholder="Write a message..."

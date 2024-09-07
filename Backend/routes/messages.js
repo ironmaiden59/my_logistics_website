@@ -21,7 +21,7 @@ router.get('/item/:itemId', async (req, res) => {
 
 // Send a new message
 router.post('/', async (req, res) => {
-  const { content, senderId, receiverId, itemId } = req.body;
+  const { content, senderId, receiverId, itemId, senderName } = req.body;
 
   // Validate that all required fields are present
   if (!content || !senderId || !receiverId || !itemId) {
@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
       senderId,
       receiverId,
       itemId,
+      senderName: senderName || 'Anonymous',
     });
 
     res.status(201).json(newMessage);

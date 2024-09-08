@@ -16,9 +16,7 @@ const RespondToBuyer = () => {
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
 
-  // Debugging: Log token to ensure it's being fetched correctly
-  console.log('Token:', token);
-
+  // Fetch item and validate token on component mount
   useEffect(() => {
     const validateTokenAndFetchItem = async () => {
       try {
@@ -29,6 +27,7 @@ const RespondToBuyer = () => {
         if (response.data.valid) {
           setIsValidToken(true); // Mark token as valid
           setItem(response.data.item); // Set the item data
+          fetchMessages(); // Fetch messages after token validation
         } else {
           navigate('/login'); // Navigate to login page if token is invalid
         }
@@ -40,14 +39,24 @@ const RespondToBuyer = () => {
     validateTokenAndFetchItem();
   }, [token, navigate]);
 
+  // Fetch messages related to the item
+  const fetchMessages = async () => {
+    try {
+      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
+      setMessages(messagesResponse.data);
+    } catch (err) {
+      console.error('Error fetching messages:', err.response?.data || err.message);
+    }
+  };
+
   const handleMessageSend = async () => {
     if (!item) {
       console.error('Item information is not available.');
       return;
     }
-    
+
     const buyerId = 1; // Assuming buyerId is 1 (replace with actual buyer ID)
-  
+
     try {
       await axios.post('http://localhost:5000/messages', {
         content: newMessage,
@@ -57,18 +66,19 @@ const RespondToBuyer = () => {
         receiverId: item.userId, // Provide receiverId (the seller's userId)
         token, // Send the token along with the message
       });
+
+      // Clear the message input
       setNewMessage('');
-  
-      // Fetch updated messages
-      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
-      setMessages(messagesResponse.data);
+
+      // Re-fetch updated messages
+      fetchMessages();
     } catch (err) {
       console.error('Error sending message:', err.response?.data || err.message);
     }
   };
 
   if (!isValidToken) {
-    return <p>Loading...</p>; 
+    return <p>Loading...</p>; // Show loading or redirect to login
   }
 
   // Calculate the fee and total
@@ -92,11 +102,11 @@ const RespondToBuyer = () => {
         <div className="message-list mb-4">
           {messages.map((message, index) => (
             <div key={index} className="bg-gray-100 p-4 rounded-lg mb-2">
-              <p>{message.content}</p>
+              <p><strong>{message.senderName}:</strong> {message.content}</p>
             </div>
           ))}
         </div>
-        
+
         {/* Input for seller's name */}
         <textarea
           className="w-full p-3 border border-gray-300 rounded-lg"

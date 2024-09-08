@@ -90,45 +90,48 @@ const RespondToBuyer = () => {
       <h2 className="text-3xl font-bold mb-6 text-center">{item?.name}</h2>
       <p className="text-blue-600 font-bold mt-2 text-center">Price: ${item?.price}</p>
 
-      {/* Show the fee and total if price is greater than 100 */}
       {parseFloat(item?.price) > 100 && (
         <p className="text-red-600 font-bold mt-2 text-center">
           Fee: ${fee} | Total: ${total.toFixed(2)}
         </p>
       )}
 
-      <div className="messages mt-8">
-        <h3 className="text-2xl font-bold mb-4">Messages</h3>
-        <div className="message-list mb-4">
-          {messages.map((message, index) => (
-            <div key={index} className="bg-gray-100 p-4 rounded-lg mb-2">
-              <p><strong>{message.senderName}:</strong> {message.content}</p>
-            </div>
-          ))}
+      {/* Message Box at Bottom */}
+      <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg">
+        <div className="max-w-xl mx-auto p-4">
+          <h3 className="text-xl font-semibold mb-4">Messages</h3>
+          <div className="message-list h-48 overflow-y-auto bg-gray-100 p-3 rounded-lg">
+            {messages.map((message, index) => (
+              <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
+                <p><strong>{message.senderName}:</strong> {message.content}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4">
+            <input
+              type="text"
+              className="w-full p-2 border rounded mb-2"
+              placeholder="Enter your name"
+              value={senderName}
+              onChange={(e) => setSenderName(e.target.value)}
+            />
+
+            <textarea
+              className="w-full p-2 border rounded mb-2"
+              placeholder="Write a message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            ></textarea>
+
+            <button
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+              onClick={handleMessageSend}
+            >
+              Send Message
+            </button>
+          </div>
         </div>
-
-        {/* Input for seller's name */}
-        <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg"
-          placeholder="Enter your name"
-          value={senderName}
-          onChange={(e) => setSenderName(e.target.value)}
-        ></textarea>
-
-        {/* Input for message */}
-        <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg"
-          placeholder="Write a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        ></textarea>
-
-        <button
-          className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-          onClick={handleMessageSend}
-        >
-          Send Message
-        </button>
       </div>
     </div>
   );

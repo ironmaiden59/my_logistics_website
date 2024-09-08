@@ -68,13 +68,24 @@ const RespondToBuyer = () => {
   };
 
   if (!isValidToken) {
-    return <p>Loading...</p>; // Show loading or redirect to login
+    return <p>Loading...</p>; 
   }
+
+  // Calculate the fee and total
+  const fee = parseFloat(item?.price) > 100 ? 15.99 : 0;
+  const total = parseFloat(item?.price) + fee;
 
   return (
     <div className="respond-to-buyer container mx-auto p-6">
       <h2 className="text-3xl font-bold mb-6 text-center">{item?.name}</h2>
       <p className="text-blue-600 font-bold mt-2 text-center">Price: ${item?.price}</p>
+
+      {/* Show the fee and total if price is greater than 100 */}
+      {parseFloat(item?.price) > 100 && (
+        <p className="text-red-600 font-bold mt-2 text-center">
+          Fee: ${fee} | Total: ${total.toFixed(2)}
+        </p>
+      )}
 
       <div className="messages mt-8">
         <h3 className="text-2xl font-bold mb-4">Messages</h3>
@@ -85,18 +96,23 @@ const RespondToBuyer = () => {
             </div>
           ))}
         </div>
+        
+        {/* Input for seller's name */}
         <textarea
-  className="w-full p-3 border border-gray-300 rounded-lg"
-  placeholder="Enter your name"
-  value={senderName}
-  onChange={(e) => setSenderName(e.target.value)}
-></textarea>
+          className="w-full p-3 border border-gray-300 rounded-lg"
+          placeholder="Enter your name"
+          value={senderName}
+          onChange={(e) => setSenderName(e.target.value)}
+        ></textarea>
+
+        {/* Input for message */}
         <textarea
           className="w-full p-3 border border-gray-300 rounded-lg"
           placeholder="Write a message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         ></textarea>
+
         <button
           className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
           onClick={handleMessageSend}

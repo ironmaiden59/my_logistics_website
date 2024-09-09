@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import io from 'socket.io-client';
 
 const ItemDetail = () => {
   const { id } = useParams(); // Get the item ID from the URL
@@ -8,6 +9,16 @@ const ItemDetail = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
+  const [socket, setSocket] = useState(null); // Socket.IO instance
+
+  // Establish WebSocket connection on component mount
+  useEffect(() => {
+    const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
+    setSocket(newSocket);
+
+    // Cleanup when the component unmounts
+    return () => newSocket.close();
+  }, []);
 
   useEffect(() => {
     const fetchItemAndMessages = async () => {
@@ -20,17 +31,14 @@ const ItemDetail = () => {
         const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
         setMessages(messagesResponse.data);
 
-        // Assuming the buyerId is available from the user's session or context
-        const buyerId = 1; // Replace this with actual buyerId logic
-
         // Fetch JWT token from local storage (or wherever you're storing it)
         const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
 
         // Generate a tokenized link using JWT
         const linkResponse = await axios.get(`http://localhost:5000/items/${id}/generate-link`, {
           headers: {
-            'Authorization': `Bearer ${token}` // Include the JWT
-          }
+            Authorization: `Bearer ${token}`, // Include the JWT
+          },
         });
 
         // Set the generated link in state
@@ -42,27 +50,41 @@ const ItemDetail = () => {
     };
 
     fetchItemAndMessages();
-  }, [id]);
 
-  // Send new message
-  const handleMessageSend = async () => {
-    const buyerId = 1;
-    try {
-      const buyerId = 1; // Replace with actual buyerId
-      await axios.post('http://localhost:5000/messages', {
-        content: newMessage,
-        senderId: buyerId, // Buyer as the sender
-        receiverId: item.userId, // Seller as the receiver
-        itemId: id,
+    if (socket) {
+      // Listen for new messages
+      socket.on('newMessage', (message) => {
+        if (message.itemId === id) {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        }
       });
-      setNewMessage('');
 
-      // Fetch updated messages
-      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
-      setMessages(messagesResponse.data);
-    } catch (err) {
-      console.error('Error sending message:', err.response?.data || err.message);
+      // Cleanup the socket listener
+      return () => {
+        socket.off('newMessage');
+      };
     }
+  }, [id, socket]);
+
+  // Send new message via WebSocket
+  const handleMessageSend = () => {
+    const buyerId = 1; // Replace with actual buyerId
+    const messageData = {
+      content: newMessage,
+      senderId: buyerId, // Buyer as the sender
+      receiverId: item.userId, // Seller as the receiver
+      itemId: id,
+    };
+
+    // Emit the message via WebSocket
+    socket.emit('sendMessage', messageData, (error) => {
+      if (error) {
+        console.error('Error sending message:', error);
+      } else {
+        // Message sent successfully
+        setNewMessage(''); // Clear the input field
+      }
+    });
   };
 
   if (!item) {

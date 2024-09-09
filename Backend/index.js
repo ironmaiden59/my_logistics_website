@@ -6,11 +6,18 @@ const { Sequelize } = require('sequelize');
 const { User } = require('./models'); // Import User model
 const itemRoutes = require('./routes/items');
 const cors = require('cors');
+const session = require('express-session');
 const messageRoutes = require('./routes/messages');
 const authenticateToken = require('./middleware/authenticateToken');
 
+// Import necessary modules for Socket.IO
+const http = require('http'); // Create an HTTP server
+const { Server } = require('socket.io');
 
 const app = express();
+const server = http.createServer(app); // Create the HTTP server
+const io = new Server(server); // Set up the WebSocket server
+
 app.use(express.json());
 app.use(cors()); // Enable all CORS requests
 // Serve static files from the uploads directory
@@ -46,6 +53,28 @@ app.use('/messages', messageRoutes);
 sequelize.authenticate()
   .then(() => console.log('Database connected...'))
   .catch(err => console.log('Error: ' + err));
+
+  // WebSocket connection
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Listen for 'sendMessage' event from client
+  socket.on('sendMessage', async (messageData) => {
+    try {
+      // Handle message creation here, e.g., save the message to the database
+      const newMessage = await Message.create(messageData); // Assuming the Message model is imported
+      // Emit the new message to all connected clients
+      io.emit('newMessage', newMessage);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
 
 // Routes
 
@@ -211,8 +240,8 @@ app.put('/user/preferences', authenticateToken, async (req, res) => {
   }
 });
 
-// Start the server
+// Start the server with WebSocket support
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

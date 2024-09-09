@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000'); // Connect to WebSocket server
 
 const RespondToBuyer = () => {
   const { id } = useParams(); // Get the item ID from the URL
@@ -11,10 +14,19 @@ const RespondToBuyer = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isValidToken, setIsValidToken] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   // Extract token from the query parameters
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:5000'); // Initialize socket connection
+    setSocket(newSocket);
+
+    // Cleanup when the component unmounts
+    return () => newSocket.close();
+  }, []);
 
   // Fetch item and validate token on component mount
   useEffect(() => {
@@ -37,7 +49,21 @@ const RespondToBuyer = () => {
       }
     };
     validateTokenAndFetchItem();
-  }, [token, navigate]);
+
+    if (socket) {
+      // Listen for new messages
+      socket.on('newMessage', (message) => {
+        if (message.itemId === id) {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        }
+      });
+
+      // Cleanup the socket listener
+      return () => {
+        socket.off('newMessage');
+      };
+    }
+  }, [token, navigate, socket]);
 
   // Fetch messages related to the item
   const fetchMessages = async () => {
@@ -49,32 +75,30 @@ const RespondToBuyer = () => {
     }
   };
 
-  const handleMessageSend = async () => {
+  const handleMessageSend = () => {
     if (!item) {
       console.error('Item information is not available.');
       return;
     }
 
-    const buyerId = 1; // Assuming buyerId is 1 (replace with actual buyer ID)
+    const buyerId = 1;
+    const messageData = {
+      content: newMessage,
+      itemId: item.id,
+      senderName: senderName || 'Anonymous',
+      senderId: buyerId,
+      receiverId: item.userId,
+    };
 
-    try {
-      await axios.post('http://localhost:5000/messages', {
-        content: newMessage,
-        itemId: item.id,
-        senderName: senderName || 'Anonymous', // Default to 'Anonymous' if no name is provided
-        senderId: buyerId, // Provide senderId (the buyer)
-        receiverId: item.userId, // Provide receiverId (the seller's userId)
-        token, // Send the token along with the message
-      });
-
-      // Clear the message input
-      setNewMessage('');
-
-      // Re-fetch updated messages
-      fetchMessages();
-    } catch (err) {
-      console.error('Error sending message:', err.response?.data || err.message);
-    }
+    // Emit the message via WebSocket
+    socket.emit('sendMessage', messageData, (error) => {
+      if (error) {
+        console.error('Error sending message:', error);
+      } else {
+        // Message sent successfully
+        setNewMessage(''); // Clear the input field
+      }
+    });
   };
 
   if (!isValidToken) {

@@ -16,7 +16,20 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app); // Create the HTTP server
-const io = new Server(server); // Set up the WebSocket server
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000', // Allow the frontend origin
+    methods: ['GET', 'POST'],
+    credentials: true, // Allow credentials such as cookies
+  },
+});
+
+// CORS middleware for HTTP routes
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(cors()); // Enable all CORS requests
@@ -54,24 +67,17 @@ sequelize.authenticate()
   .then(() => console.log('Database connected...'))
   .catch(err => console.log('Error: ' + err));
 
-  // WebSocket connection
+// Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('New client connected:', socket.id);
 
-  // Listen for 'sendMessage' event from client
-  socket.on('sendMessage', async (messageData) => {
-    try {
-      // Handle message creation here, e.g., save the message to the database
-      const newMessage = await Message.create(messageData); // Assuming the Message model is imported
-      // Emit the new message to all connected clients
-      io.emit('newMessage', newMessage);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
+  socket.on('sendMessage', (messageData) => {
+    // Broadcast the message to other clients
+    io.emit('newMessage', messageData);
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('Client disconnected:', socket.id);
   });
 });
 

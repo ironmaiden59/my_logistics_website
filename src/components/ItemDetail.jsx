@@ -68,6 +68,10 @@ const ItemDetail = () => {
 
   // Send new message via WebSocket
   const handleMessageSend = () => {
+    if (!newMessage.trim()) {
+      return; // Do not send an empty message
+    }
+  
     const buyerId = 1; // Replace with actual buyerId
     const messageData = {
       content: newMessage,
@@ -75,14 +79,16 @@ const ItemDetail = () => {
       receiverId: item.userId, // Seller as the receiver
       itemId: id,
     };
-
+  
+    // Clear the message input before emitting
+    setNewMessage('');
+  
     // Emit the message via WebSocket
     socket.emit('sendMessage', messageData, (error) => {
       if (error) {
         console.error('Error sending message:', error);
       } else {
-        // Message sent successfully
-        setNewMessage(''); // Clear the input field
+        // Optionally handle any post-send success action here
       }
     });
   };

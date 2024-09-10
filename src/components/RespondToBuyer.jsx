@@ -3,13 +3,10 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000'); // Connect to WebSocket server
-
 const RespondToBuyer = () => {
   const { id } = useParams(); // Get the item ID from the URL
-  const location = useLocation();
-  const navigate = useNavigate(); // For redirecting
-  const [item, setItem] = useState(null);
+  const location = useLocation(); // Get the location object
+  const [item, setItem] = useState(null); // Fetch the item here
   const [senderName, setSenderName] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -17,11 +14,12 @@ const RespondToBuyer = () => {
   const [socket, setSocket] = useState(null);
 
   // Extract token from the query parameters
-  const queryParams = new URLSearchParams(location.search);
+  const queryParams = new URLSearchParams(location.search); // Use location.search
   const token = queryParams.get('token');
 
+  // Initialize WebSocket connection
   useEffect(() => {
-    const newSocket = io('http://localhost:5000'); // Initialize socket connection
+    const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
     setSocket(newSocket);
 
     // Cleanup when the component unmounts
@@ -33,7 +31,7 @@ const RespondToBuyer = () => {
     const validateTokenAndFetchItem = async () => {
       try {
         const response = await axios.post('http://localhost:5000/messages/validate-token', {
-          token: token, // Send token in the request
+          token: token, // Send the token extracted from the URL
         });
 
         if (response.data.valid) {
@@ -41,14 +39,16 @@ const RespondToBuyer = () => {
           setItem(response.data.item); // Set the item data
           fetchMessages(); // Fetch messages after token validation
         } else {
-          navigate('/login'); // Navigate to login page if token is invalid
+          console.error('Invalid token');
         }
       } catch (error) {
         console.error('Error validating token:', error);
-        navigate('/error'); // Navigate to error page if token validation fails
       }
     };
-    validateTokenAndFetchItem();
+
+    if (id) {
+      validateTokenAndFetchItem();
+    }
 
     if (socket) {
       // Listen for new messages
@@ -63,7 +63,7 @@ const RespondToBuyer = () => {
         socket.off('newMessage');
       };
     }
-  }, [token, navigate, socket]);
+  }, [id, socket, token]); // Include the socket, id, and token in the dependency array
 
   // Fetch messages related to the item
   const fetchMessages = async () => {
@@ -75,28 +75,28 @@ const RespondToBuyer = () => {
     }
   };
 
+  // Send new message via WebSocket
   const handleMessageSend = () => {
-    if (!item) {
-      console.error('Item information is not available.');
-      return;
+    if (!newMessage.trim()) {
+      return; // Do not send an empty message
     }
 
-    const buyerId = 1;
+    const buyerId = 1; // Replace with actual buyerId
     const messageData = {
       content: newMessage,
-      itemId: item.id,
-      senderName: senderName || 'Anonymous',
+      senderName: senderName || 'Anonymous', // Provide senderName
       senderId: buyerId,
-      receiverId: item.userId,
+      receiverId: item?.userId, // Use the seller's userId
+      itemId: id,
     };
+
+    // Clear the message input before emitting
+    setNewMessage('');
 
     // Emit the message via WebSocket
     socket.emit('sendMessage', messageData, (error) => {
       if (error) {
         console.error('Error sending message:', error);
-      } else {
-        // Message sent successfully
-        setNewMessage(''); // Clear the input field
       }
     });
   };

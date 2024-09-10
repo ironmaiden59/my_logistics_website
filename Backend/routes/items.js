@@ -51,8 +51,11 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ message: 'Invalid price format' });
   }
 
+  // You can set a default userId, for example, representing "system" or "admin" user
+  const userId = 1; // Default userId for items created via the Chrome extension
+
   try {
-    const item = await Item.create({ name, price });
+    const item = await Item.create({ name, price, userId }); // Use default userId here
     res.status(201).json(item);
   } catch (error) {
     console.error('Error adding item:', error);

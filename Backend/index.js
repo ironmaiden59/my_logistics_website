@@ -25,14 +25,25 @@ const io = new Server(server, {
 });
 
 // CORS middleware for HTTP routes
+const allowedOrigins = [
+  'http://localhost:3000', // Your web app
+  'chrome-extension://dghlmhdbgcllfmfelhljdgpgjcffbbbp', // Your Chrome extension
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
 
 app.use(express.json());
-app.use(cors()); // Enable all CORS requests
+
 // Serve static files from the uploads directory
 app.use('/uploads', express.static('uploads'));
 app.use('/items', itemRoutes);

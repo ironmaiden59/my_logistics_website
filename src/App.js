@@ -2,10 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import HowItWorks from './components/HowitWorks';
-import Contact from './components/Contact';
+import HomePage from './components/HomePage';
 // import Footer from './components/Footer';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
@@ -22,22 +19,12 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
-          <Route path="/" element={
-            <>
-              <Hero />
-              <Features />
-              <HowItWorks />
-              <Contact />
-            </>
-          } />
+          <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
-          
           <Route path="/items/:id" element={<ItemDetail />} />
           <Route path="/buy-item" element={<BuyItem />} />
-          
-          
           <Route path="/respond-to-buyer/:id" element={<RespondToBuyer />} />
         </Routes>
         

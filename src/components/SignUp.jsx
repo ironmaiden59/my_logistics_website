@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,13 @@ const SignUp = () => {
   });
 
   const [error, setError] = useState(null); // State for handling errors
+  const { login } = useContext(AuthContext); // Access login function from AuthContext
+  const navigate = useNavigate(); // Use navigate for redirection
+  const location = useLocation(); // To get the current location
+
+  // Extract the redirect query parameter
+  const queryParams = new URLSearchParams(location.search);
+  const redirect = queryParams.get('redirect') || '/'; // Default to home if no redirect is provided
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,17 +34,16 @@ const SignUp = () => {
       
       console.log('User signed up:', response.data);
 
+      // Store the authentication token and log in the user via AuthContext
+      localStorage.setItem('authToken', response.data.token);
+      login(response.data.token); // This will update the isAuthenticated state in the AuthContext
+
       // Show a success message
       alert('Sign-up successful!');
 
-      // Optionally, you can redirect to another page or clear the form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-      });
-      setError(null); // Clear any previous errors
+      // Redirect to the originally intended page
+      navigate(redirect);
+
     } catch (err) {
       console.error('Error signing up:', err.response?.data || err.message);
       // Set an error message

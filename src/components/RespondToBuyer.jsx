@@ -6,16 +6,34 @@ import io from 'socket.io-client';
 const RespondToBuyer = () => {
   const { id } = useParams(); // Get the item ID from the URL
   const location = useLocation(); // Get the location object
+  const navigate = useNavigate();
   const [item, setItem] = useState(null); // Fetch the item here
   const [senderName, setSenderName] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isValidToken, setIsValidToken] = useState(false);
   const [socket, setSocket] = useState(null);
 
   // Extract token from the query parameters
   const queryParams = new URLSearchParams(location.search); // Use location.search
   const token = queryParams.get('token');
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuthentication = () => {
+      const authToken = localStorage.getItem('authToken'); // Assuming token is stored in localStorage
+
+      if (!authToken) {
+        // Redirect to sign-up or login page if not authenticated
+        navigate(`/signup?redirect=/respond-to-buyer/${id}?token=${token}`);
+      } else {
+        setIsAuthenticated(true); // Mark as authenticated
+      }
+    };
+
+    checkAuthentication();
+  }, [id, token, navigate]);
 
   // Initialize WebSocket connection
   useEffect(() => {

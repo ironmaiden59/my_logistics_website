@@ -49,11 +49,6 @@ app.use('/uploads', express.static('uploads'));
 app.use('/items', itemRoutes);
 app.use('/messages', messageRoutes);
 
-// Import routes
-const productRoutes = require('./routes/products');
-const salesRoutes = require('./routes/sales');
-const deliveryRoutes = require('./routes/deliveries');
-
 
 // Connect to PostgreSQL
 const sequelize = new Sequelize(
@@ -68,9 +63,6 @@ const sequelize = new Sequelize(
 
 
   // Use routes
-app.use('/products', productRoutes);
-app.use('/sales', salesRoutes);
-app.use('/deliveries', deliveryRoutes);
 app.use('/messages', messageRoutes);
 
 // Test database connection

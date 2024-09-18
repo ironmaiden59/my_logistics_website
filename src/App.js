@@ -10,11 +10,8 @@ import Contact from './components/Contact';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
 import Profile from './components/Profile';
-import EditProduct from './components/EditProduct';
 import BuyItem from './components/BuyItem';
 import ItemDetail from './components/ItemDetail';
-import SellerDashboard from './components/SellerDashboard';
-import ProductManagement from './components/ProductManagement';
 import RespondToBuyer from './components/RespondToBuyer';
 import './styles/styles.css'; 
 
@@ -36,14 +33,14 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/dashboard" element={<SellerDashboard />} />
+          
           <Route path="/items/:id" element={<ItemDetail />} />
           <Route path="/buy-item" element={<BuyItem />} />
-          <Route path="/products" element={<ProductManagement />} />
-          <Route path="/products/edit/:id" element={<EditProduct />} />
+          
+          
           <Route path="/respond-to-buyer/:id" element={<RespondToBuyer />} />
         </Routes>
-        {/* <Footer /> */} 
+        
       </div>
     </Router>
     </AuthProvider>

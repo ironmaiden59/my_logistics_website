@@ -41,16 +41,7 @@ const Header = () => {
             </li>
             {isAuthenticated ? (
               <>
-                <li>
-                  <Link to="/dashboard" className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                    Seller Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products" className="bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors">
-                    Product Management
-                  </Link>
-                </li>
+                
                 <li>
               <Link to="/buy-item" className="text-gray-800 hover:text-blue-600 transition-colors">
                 Buy Items

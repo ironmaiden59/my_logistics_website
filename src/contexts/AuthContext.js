@@ -9,18 +9,19 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if the user is authenticated by looking for a token in local storage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     setIsAuthenticated(!!token); // Convert token presence to a boolean
   }, []);
 
-  // Define a login function to update authentication state
-  const login = () => {
+  // Function to log in the user (used in login or signup)
+  const login = (token) => {
+    localStorage.setItem('authToken', token);
     setIsAuthenticated(true);
   };
 
   // Define a logout function to clear authentication state
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     setIsAuthenticated(false);
   };
 

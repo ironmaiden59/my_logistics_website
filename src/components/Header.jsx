@@ -21,11 +21,6 @@ const Header = () => {
         </div>
         <nav>
           <ul className="flex space-x-6">
-            <li>
-              <Link to="/" className="text-gray-800 hover:text-blue-600 transition-colors">
-                Home
-              </Link>
-            </li>
             
             {isAuthenticated ? (
               <>

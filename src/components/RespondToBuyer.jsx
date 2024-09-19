@@ -129,8 +129,8 @@ const RespondToBuyer = () => {
 
   return (
     <div className="respond-to-buyer container mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center">{item?.name}</h2>
-      <p className="text-blue-600 font-bold mt-2 text-center">Price: ${item?.price}</p>
+      <h2 className="text-3xl font-bold mb-6 text-center text-teal-600">{item?.name}</h2>
+      <p className="text-teal-600 font-bold mt-2 text-center">Price: ${item?.price}</p>
 
       {parseFloat(item?.price) > 100 && (
         <p className="text-red-600 font-bold mt-2 text-center">
@@ -141,11 +141,13 @@ const RespondToBuyer = () => {
       {/* Message Box at Bottom */}
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg">
         <div className="max-w-xl mx-auto p-4">
-          <h3 className="text-xl font-semibold mb-4">Messages</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Messages</h3>
           <div className="message-list h-48 overflow-y-auto bg-gray-100 p-3 rounded-lg">
             {messages.map((message, index) => (
               <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
-                <p><strong>{message.senderName}:</strong> {message.content}</p>
+                <p>
+                  <strong>{message.senderName}:</strong> {message.content}
+                </p>
               </div>
             ))}
           </div>
@@ -153,21 +155,21 @@ const RespondToBuyer = () => {
           <div className="mt-4">
             <input
               type="text"
-              className="w-full p-2 border rounded mb-2"
+              className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
               placeholder="Enter your name"
               value={senderName}
               onChange={(e) => setSenderName(e.target.value)}
             />
 
             <textarea
-              className="w-full p-2 border rounded mb-2"
+              className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
               placeholder="Write a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
             ></textarea>
 
             <button
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+              className="w-full bg-teal-500 text-white py-2 rounded-full hover:bg-teal-600 transition-colors"
               onClick={handleMessageSend}
             >
               Send Message

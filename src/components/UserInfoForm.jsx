@@ -70,118 +70,36 @@ const UserInfoForm = () => {
   return (
     <div className="mb-6">
       <h3 className="text-xl font-bold text-gray-700 mb-4">User Information</h3>
-      {message && <p className="text-red-500">{message}</p>}
+      {message && <p className={`text-center mt-2 ${message.includes('success') ? 'text-green-500' : 'text-red-500'}`}>{message}</p>}
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-            First Name
-          </label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={userInfo.firstName}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={userInfo.lastName}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={userInfo.email}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="address1" className="block text-sm font-medium text-gray-700">
-            Address 1
-          </label>
-          <input
-            type="text"
-            id="address1"
-            name="address1"
-            value={userInfo.address1}
-            onChange={handleChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="address2" className="block text-sm font-medium text-gray-700">
-            Address 2
-          </label>
-          <input
-            type="text"
-            id="address2"
-            name="address2"
-            value={userInfo.address2}
-            onChange={handleChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-            City or Town
-          </label>
-          <input
-            type="text"
-            id="city"
-            name="city"
-            value={userInfo.city}
-            onChange={handleChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-            State/Province
-          </label>
-          <input
-            type="text"
-            id="state"
-            name="state"
-            value={userInfo.state}
-            onChange={handleChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
-            Zip Code/Postal Code
-          </label>
-          <input
-            type="text"
-            id="zipCode"
-            name="zipCode"
-            value={userInfo.zipCode}
-            onChange={handleChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
+        {/* Input Fields */}
+        {[
+          { label: 'First Name', name: 'firstName', type: 'text' },
+          { label: 'Last Name', name: 'lastName', type: 'text' },
+          { label: 'Email', name: 'email', type: 'email' },
+          { label: 'Address 1', name: 'address1', type: 'text' },
+          { label: 'Address 2', name: 'address2', type: 'text' },
+          { label: 'City or Town', name: 'city', type: 'text' },
+          { label: 'State/Province', name: 'state', type: 'text' },
+          { label: 'Zip Code/Postal Code', name: 'zipCode', type: 'text' },
+        ].map((field, index) => (
+          <div className="mb-4" key={index}>
+            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+              {field.label}
+            </label>
+            <input
+              type={field.type}
+              id={field.name}
+              name={field.name}
+              value={userInfo[field.name]}
+              onChange={handleChange}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
+            />
+          </div>
+        ))}
         <button
           type="submit"
-          className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          className="w-full py-3 px-6 bg-teal-500 text-white rounded-full font-semibold hover:bg-teal-600 transition-colors"
         >
           Update Information
         </button>

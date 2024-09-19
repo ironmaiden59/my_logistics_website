@@ -44,53 +44,32 @@ const PasswordManagement = () => {
   return (
     <div className="mb-6">
       <h3 className="text-xl font-bold text-gray-700 mb-4">Password Management</h3>
-      {message && <p className="text-red-500">{message}</p>}
+      {message && <p className={`text-center mt-2 ${message.includes('success') ? 'text-green-500' : 'text-red-500'}`}>{message}</p>}
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-            Current Password
-          </label>
-          <input
-            type="password"
-            id="currentPassword"
-            name="currentPassword"
-            value={passwords.currentPassword}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-            New Password
-          </label>
-          <input
-            type="password"
-            id="newPassword"
-            name="newPassword"
-            value={passwords.newPassword}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-            Confirm New Password
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={passwords.confirmPassword}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
+        {/* Password Fields */}
+        {[
+          { label: 'Current Password', name: 'currentPassword' },
+          { label: 'New Password', name: 'newPassword' },
+          { label: 'Confirm New Password', name: 'confirmPassword' },
+        ].map((field, index) => (
+          <div className="mb-4" key={index}>
+            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+              {field.label}
+            </label>
+            <input
+              type="password"
+              id={field.name}
+              name={field.name}
+              value={passwords[field.name]}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
+            />
+          </div>
+        ))}
         <button
           type="submit"
-          className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          className="w-full py-3 px-6 bg-teal-500 text-white rounded-full font-semibold hover:bg-teal-600 transition-colors"
         >
           Change Password
         </button>

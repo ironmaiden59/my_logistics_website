@@ -109,7 +109,7 @@ app.post('/signup', async (req, res) => {
     });
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
     res.status(201).json({ token, message: 'User created successfully' });
   } catch (error) {

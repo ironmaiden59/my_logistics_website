@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -44,8 +45,13 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Login</h2>
+      <motion.div
+        className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h2 className="text-3xl font-bold text-center text-teal-600 mb-6">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -58,7 +64,7 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <div className="mb-6">
@@ -72,21 +78,24 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="w-full py-3 px-6 bg-teal-500 text-white rounded-full font-semibold hover:bg-teal-600 transition-colors"
           >
             Login
           </button>
           {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
-          Don't have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign Up</a>
+          Don't have an account?{' '}
+          <a href="/signup" className="text-teal-600 hover:underline">
+            Sign Up
+            </a>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };

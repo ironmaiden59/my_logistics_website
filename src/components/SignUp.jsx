@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -53,8 +54,13 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Sign Up</h2>
+      <motion.div
+        className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h2 className="text-3xl font-bold text-center text-teal-600 mb-6">Sign Up</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
@@ -67,7 +73,7 @@ const SignUp = () => {
               value={formData.firstName}
               onChange={handleChange}
               required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <div className="mb-4">
@@ -81,7 +87,7 @@ const SignUp = () => {
               value={formData.lastName}
               onChange={handleChange}
               required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <div className="mb-4">
@@ -95,7 +101,7 @@ const SignUp = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <div className="mb-6">
@@ -109,12 +115,12 @@ const SignUp = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="w-full py-3 px-6 bg-teal-500 text-white rounded-full font-semibold hover:bg-teal-600 transition-colors"
           >
             Sign Up
           </button>
@@ -122,11 +128,11 @@ const SignUp = () => {
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
           Already have an account?{' '}
-          <a href="/login" className="text-blue-600 hover:underline">
+          <a href="/login" className="text-teal-600 hover:underline">
             Log In
-          </a>
+            </a>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };

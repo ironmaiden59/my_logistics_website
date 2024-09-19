@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const HomePage = () => {
   const handleContactSubmit = (event) => {
@@ -7,15 +8,51 @@ const HomePage = () => {
     alert('Form submitted! We will contact you soon.');
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
   return (
     <div>
       {/* Hero Section */}
-      <section
+      <motion.section
         id="hero"
         className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white py-24"
+        initial="hidden"
+        animate="visible"
+        variants={fadeInUp}
+        transition={{ duration: 0.8 }}
       >
         <div className="container mx-auto flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 text-center md:text-left">
+          <motion.div
+            className="md:w-1/2 text-center md:text-left"
+            variants={fadeInUp}
+            transition={{ duration: 0.8 }}
+          >
             <h1 className="text-5xl font-bold mb-6">
               Transform Online Deals into Doorstep Deliveries
             </h1>
@@ -28,63 +65,92 @@ const HomePage = () => {
             >
               Get Started
             </Link>
-          </div>
-          <div className="md:w-1/2 mt-12 md:mt-0">
+          </motion.div>
+          <motion.div
+            className="md:w-1/2 mt-12 md:mt-0"
+            variants={fadeIn}
+            transition={{ duration: 1.2 }}
+          >
             {/* <img
               src="/images/hero-image.svg"
               alt="Convenient online transactions"
               className="w-full"
             /> */}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-white">
+      <motion.section
+        id="features"
+        className="py-24 bg-white"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={containerVariants}
+      >
         <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-12">Why Choose Us?</h2>
+          <motion.h2 className="text-4xl font-bold mb-12" variants={itemVariants}>
+            Why Choose Us?
+          </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="p-6">
-              {/* <img
-                src="/images/feature-easy.svg"
-                alt="Easy to Use"
-                className="w-24 h-24 mx-auto mb-4"
-              /> */}
-              <h3 className="text-2xl font-semibold mb-2">Seamless Experience</h3>
-              <p>
-                Import products directly from marketplaces using our Chrome extension.
-              </p>
-            </div>
-            <div className="p-6">
-              {/* <img
-                src="/images/feature-secure.svg"
-                alt="Secure Transactions"
-                className="w-24 h-24 mx-auto mb-4"
-              /> */}
-              <h3 className="text-2xl font-semibold mb-2">Secure Payments</h3>
-              <p>
-                Conduct transactions safely within our platform with full transparency.
-              </p>
-            </div>
-            <div className="p-6">
-              {/* <img
-                src="/images/feature-delivery.svg"
-                alt="We Deliver"
-                className="w-24 h-24 mx-auto mb-4"
-              /> */}
-              <h3 className="text-2xl font-semibold mb-2">Hassle-Free Delivery</h3>
-              <p>
-                We manage the pickup and delivery, bringing your items straight to your door.
-              </p>
-            </div>
+            {[
+              {
+                title: 'Seamless Experience',
+                description:
+                  'Import products directly from marketplaces using our Chrome extension.',
+                image: '/images/feature-easy.svg',
+                alt: 'Easy to Use',
+              },
+              {
+                title: 'Secure Payments',
+                description:
+                  'Conduct transactions safely within our platform with full transparency.',
+                image: '/images/feature-secure.svg',
+                alt: 'Secure Transactions',
+              },
+              {
+                title: 'Hassle-Free Delivery',
+                description:
+                  'We manage the pickup and delivery, bringing your items straight to your door.',
+                image: '/images/feature-delivery.svg',
+                alt: 'We Deliver',
+              },
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                className="p-6"
+                variants={itemVariants}
+              >
+                {/* <img
+                  src={feature.image}
+                  alt={feature.alt}
+                  className="w-24 h-24 mx-auto mb-4"
+                /> */}
+                <h3 className="text-2xl font-semibold mb-2">{feature.title}</h3>
+                <p>{feature.description}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="bg-gray-50 py-24">
+      <motion.section
+        id="how-it-works"
+        className="bg-gray-50 py-24"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={containerVariants}
+      >
         <div className="container mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12">How It Works</h2>
+          <motion.h2
+            className="text-4xl font-bold text-center mb-12"
+            variants={itemVariants}
+          >
+            How It Works
+          </motion.h2>
           <div className="flex flex-col md:flex-row md:justify-between items-center">
             {[
               {
@@ -116,9 +182,10 @@ const HomePage = () => {
                 image: '/images/step-deliver.svg',
               },
             ].map((step, index) => (
-              <div
+              <motion.div
                 key={index}
                 className="flex-1 bg-white p-6 m-4 rounded-lg shadow-md text-center"
+                variants={itemVariants}
               >
                 {/* <img
                   src={step.image}
@@ -129,14 +196,22 @@ const HomePage = () => {
                   {step.number}. {step.title}
                 </h3>
                 <p className="text-gray-600">{step.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Call to Action Section */}
-      <section id="cta" className="bg-indigo-600 text-white py-24">
+      <motion.section
+        id="cta"
+        className="bg-indigo-600 text-white py-24"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        transition={{ duration: 0.8 }}
+      >
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">
             Ready to Simplify Your Transactions?
@@ -151,10 +226,18 @@ const HomePage = () => {
             Sign Up Today
           </Link>
         </div>
-      </section>
+      </motion.section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 bg-white">
+      <motion.section
+        id="contact"
+        className="py-24 bg-white"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        transition={{ duration: 0.8 }}
+      >
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12">Contact Us</h2>
           <form
@@ -214,7 +297,7 @@ const HomePage = () => {
             </button>
           </form>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

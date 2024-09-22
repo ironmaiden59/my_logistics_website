@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { jwtDecode } from 'jwt-decode';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -32,14 +33,21 @@ const SignUp = () => {
     try {
       // Send a POST request to the signup endpoint
       const response = await axios.post('http://localhost:5000/signup', formData);
-      
-      console.log('User signed up:', response.data);
 
-      // Store the authentication token and log in the user via AuthContext
-      localStorage.setItem('authToken', response.data.token);
-      login(response.data.token); // This will update the isAuthenticated state in the AuthContext
+      // Get the authToken from the response
+      const { authToken } = response.data;
 
-      // Show a success message
+      // Store the authentication token in localStorage
+      localStorage.setItem('authToken', authToken);
+
+      // Decode the token to get userId
+      const decodedToken = jwtDecode(authToken);
+      const userId = decodedToken.userId;
+
+      // Update the authentication state
+      login({ userId }); // This will update the isAuthenticated state in the AuthContext
+
+      // Show a success message (optional)
       alert('Sign-up successful!');
 
       // Redirect to the originally intended page

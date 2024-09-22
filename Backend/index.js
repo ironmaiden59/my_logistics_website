@@ -109,7 +109,11 @@ app.post('/signup', async (req, res) => {
     });
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const authToken = jwt.sign(
+      { userId: newUser.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     res.status(201).json({ token, message: 'User created successfully' });
   } catch (error) {
@@ -136,7 +140,7 @@ app.post('/login', async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json({ token, message: 'Login successful' });
   } catch (error) {

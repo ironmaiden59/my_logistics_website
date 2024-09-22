@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import jwtDecode from 'jwt-decode';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -26,17 +27,23 @@ const Login = () => {
       // Send a POST request to the login endpoint
       const response = await axios.post('http://localhost:5000/login', formData);
 
+      // Get the authToken from the response
+      const { authToken } = response.data;
+
       // Store the JWT token in local storage
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('authToken', authToken);
+
+      // Decode the token to get userId
+      const decodedToken = jwtDecode(authToken);
+      const userId = decodedToken.userId;
 
       // Update the authentication state
-      login();
+      login({ userId });
 
       // Optionally navigate to the profile page or another page
       navigate('/profile');
 
       setError(null); // Clear any previous errors
-
     } catch (err) {
       console.error('Error logging in:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'An error occurred during login.');

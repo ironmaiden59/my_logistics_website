@@ -1,89 +1,117 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
 
 const ItemDetail = () => {
   const { id } = useParams(); // Get the item ID from the URL
+  const navigate = useNavigate();
   const [item, setItem] = useState(null); // Fetch the item here
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
   const [socket, setSocket] = useState(null); // Socket.IO instance
 
-  // Establish WebSocket connection on component mount
-  useEffect(() => {
-    const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
-    setSocket(newSocket);
+// Initialize buyerId
+let buyerId = null;
+const authToken = localStorage.getItem('authToken');
+if (authToken) {
+  const decodedToken = jwtDecode(authToken);
+  buyerId = decodedToken.userId;
+}
 
-    // Cleanup when the component unmounts
-    return () => newSocket.close();
-  }, []);
+// Redirect to login if not authenticated
+useEffect(() => {
+  if (!authToken) {
+    navigate('/login');
+  }
+}, [authToken, navigate]);
 
-  useEffect(() => {
-    const fetchItemAndMessages = async () => {
-      try {
-        // Fetch item by ID
-        const itemResponse = await axios.get(`http://localhost:5000/items/${id}`);
-        setItem(itemResponse.data); // Store item in state
+// Establish WebSocket connection on component mount
+useEffect(() => {
+  const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
+  setSocket(newSocket);
 
-        // Fetch messages related to the item
-        const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
-        setMessages(messagesResponse.data);
+  // Cleanup when the component unmounts
+  return () => newSocket.close();
+}, []);
 
-        // Fetch JWT token from local storage (or wherever you're storing it)
-        const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+useEffect(() => {
+  const fetchItemAndMessages = async () => {
+    try {
+      // Fetch item by ID
+      const itemResponse = await axios.get(`http://localhost:5000/items/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      setItem(itemResponse.data); // Store item in state
 
-        // Generate a tokenized link using JWT
-        const linkResponse = await axios.get(`http://localhost:5000/items/${id}/generate-link`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the JWT
-          },
-        });
+      // Fetch messages related to the item
+      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      setMessages(messagesResponse.data);
 
-        // Set the generated link in state
-        setGeneratedLink(linkResponse.data.link);
-
-      } catch (err) {
-        console.error('Error fetching item or messages:', err.response?.data || err.message);
-      }
-    };
-
-    fetchItemAndMessages();
-
-    if (socket) {
-      // Listen for new messages
-      socket.on('newMessage', (message) => {
-        if (message.itemId === id) {
-          setMessages((prevMessages) => [...prevMessages, message]);
-        }
+      // Generate a tokenized link using JWT
+      const linkResponse = await axios.get(`http://localhost:5000/items/${id}/generate-link`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`, // Include the JWT
+        },
       });
 
-      // Cleanup the socket listener
-      return () => {
-        socket.off('newMessage');
-      };
-    }
-  }, [id, socket]);
+      // Set the generated link in state
+      setGeneratedLink(linkResponse.data.link);
 
-  // Send new message via WebSocket
-  const handleMessageSend = () => {
-    if (!newMessage.trim()) {
-      return; // Do not send an empty message
+    } catch (err) {
+      console.error('Error fetching item or messages:', err.response?.data || err.message);
     }
-  
-    const buyerId = 1; // Replace with actual buyerId
-    const messageData = {
-      content: newMessage,
-      senderId: buyerId, // Buyer as the sender
-      receiverId: item.userId, // Seller as the receiver
-      itemId: id,
+  };
+
+  fetchItemAndMessages();
+
+  let socketCleanup;
+  if (socket) {
+    // Listen for new messages
+    socket.on('newMessage', (message) => {
+      if (message.itemId === id) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
+    });
+
+    // Prepare the cleanup function
+    socketCleanup = () => {
+      socket.off('newMessage');
     };
-  
-    // Clear the message input before emitting
-    setNewMessage('');
-  
-    // Emit the message via WebSocket
+  }
+
+  // Return the cleanup function
+  return () => {
+    if (socketCleanup) socketCleanup();
+  };
+}, [id, socket, authToken]);
+
+// Send new message via WebSocket
+const handleMessageSend = () => {
+  if (!newMessage.trim() || !buyerId) {
+    return; // Do not send an empty message or allow unauthenticated users to send messages
+  }
+
+  const messageData = {
+    content: newMessage,
+    senderId: buyerId, // Use the actual buyerId
+    receiverId: item.userId, // Seller's userId
+    itemId: id,
+  };
+
+  // Clear the message input before emitting
+  setNewMessage('');
+
+  // Emit the message via WebSocket
+  if (socket) {
     socket.emit('sendMessage', messageData, (error) => {
       if (error) {
         console.error('Error sending message:', error);
@@ -91,7 +119,10 @@ const ItemDetail = () => {
         // Optionally handle any post-send success action here
       }
     });
-  };
+  } else {
+    console.error('WebSocket connection not established');
+  }
+};
 
   if (!item) {
     return <p>Loading...</p>;

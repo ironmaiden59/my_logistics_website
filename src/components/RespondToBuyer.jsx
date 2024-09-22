@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
 
 const RespondToBuyer = () => {
@@ -14,25 +15,24 @@ const RespondToBuyer = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isValidToken, setIsValidToken] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [userId, setUserId] = useState(null); // Initialize userId state
 
   // Extract token from the query parameters
   const queryParams = new URLSearchParams(location.search); // Use location.search
   const token = queryParams.get('token');
 
-  // Check authentication status
+  // Check authentication and get userId
   useEffect(() => {
-    const checkAuthentication = () => {
-      const authToken = localStorage.getItem('authToken'); // Assuming token is stored in localStorage
+    const authToken = localStorage.getItem('authToken'); // Assuming token is stored in localStorage
 
-      if (!authToken) {
-        // Redirect to sign-up or login page if not authenticated
-        navigate(`/signup?redirect=/respond-to-buyer/${id}?token=${token}`);
-      } else {
-        setIsAuthenticated(true); // Mark as authenticated
-      }
-    };
-
-    checkAuthentication();
+    if (authToken) {
+      const decodedToken = jwtDecode(authToken);
+      setUserId(decodedToken.userId);
+      setIsAuthenticated(true);
+    } else {
+      // Redirect to sign-up or login page if not authenticated
+      navigate(`/signup?redirect=/respond-to-buyer/${id}?token=${token}`);
+    }
   }, [id, token, navigate]);
 
   // Initialize WebSocket connection
@@ -64,10 +64,11 @@ const RespondToBuyer = () => {
       }
     };
 
-    if (id) {
+    if (id && token) {
       validateTokenAndFetchItem();
     }
 
+    let socketCleanup;
     if (socket) {
       // Listen for new messages
       socket.on('newMessage', (message) => {
@@ -76,12 +77,17 @@ const RespondToBuyer = () => {
         }
       });
 
-      // Cleanup the socket listener
-      return () => {
+      // Prepare the cleanup function
+      socketCleanup = () => {
         socket.off('newMessage');
       };
     }
-  }, [id, socket, token]); // Include the socket, id, and token in the dependency array
+
+    // Return the cleanup function
+    return () => {
+      if (socketCleanup) socketCleanup();
+    };
+  }, [id, socket, token]);
 
   // Fetch messages related to the item
   const fetchMessages = async () => {
@@ -95,16 +101,15 @@ const RespondToBuyer = () => {
 
   // Send new message via WebSocket
   const handleMessageSend = () => {
-    if (!newMessage.trim()) {
-      return; // Do not send an empty message
+    if (!newMessage.trim() || !userId) {
+      return; // Do not send an empty message or if user is not authenticated
     }
 
-    const buyerId = 1; // Replace with actual buyerId
     const messageData = {
       content: newMessage,
-      senderName: senderName || 'Anonymous', // Provide senderName
-      senderId: buyerId,
-      receiverId: item?.userId, // Use the seller's userId
+      senderName: senderName || 'Anonymous',
+      senderId: userId, // Use the actual userId
+      receiverId: item?.buyerId, // Ensure this is set appropriately
       itemId: id,
     };
 
@@ -112,20 +117,24 @@ const RespondToBuyer = () => {
     setNewMessage('');
 
     // Emit the message via WebSocket
-    socket.emit('sendMessage', messageData, (error) => {
-      if (error) {
-        console.error('Error sending message:', error);
-      }
-    });
+    if (socket) {
+      socket.emit('sendMessage', messageData, (error) => {
+        if (error) {
+          console.error('Error sending message:', error);
+        }
+      });
+    } else {
+      console.error('WebSocket connection not established');
+    }
   };
 
   if (!isValidToken) {
-    return <p>Loading...</p>; // Show loading or redirect to login
+    return <p>Loading...</p>; // Show loading or handle invalid token
   }
 
   // Calculate the fee and total
   const fee = parseFloat(item?.price) > 100 ? 15.99 : 0;
-  const total = parseFloat(item?.price) + fee;
+  const total = parseFloat(item?.price || 0) + fee;
 
   return (
     <div className="respond-to-buyer container mx-auto p-6">

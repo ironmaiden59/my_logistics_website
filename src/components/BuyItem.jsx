@@ -1,15 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 
 const BuyItem = () => {
+  const navigate = useNavigate(); // Initialize navigate
+  const { userId } = useContext(AuthContext);
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/items');
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          navigate('/login'); // Import and use `useNavigate` from 'react-router-dom'
+          return;
+        }
+        const response = await axios.get('http://localhost:5000/items', {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         setItems(response.data);
       } catch (err) {
         console.error('Error fetching items:', err.response?.data || err.message);
@@ -21,7 +33,12 @@ const BuyItem = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/items/${id}`);
+      const authToken = localStorage.getItem('authToken');
+      await axios.delete(`http://localhost:5000/items/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       setItems((prevItems) => prevItems.filter(item => item.id !== id));
     } catch (err) {
       console.error('Error deleting item:', err.response?.data || err.message);
@@ -49,7 +66,7 @@ const BuyItem = () => {
               <h3 className="text-lg font-bold mb-2 text-gray-800">{item.name}</h3>
               <p className="text-teal-600 font-bold mt-2">${item.price}</p>
             </Link>
-            {item.id && (
+            {item.userId === userId && (
               <button
                 onClick={() => handleDelete(item.id)}
                 className="mt-4 bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-600 transition-colors"

@@ -110,12 +110,12 @@ app.post('/signup', async (req, res) => {
 
     // Generate a JWT token
     const authToken = jwt.sign(
-      { userId: newUser.id },
+      { userId: user.id },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     );
 
-    res.status(201).json({ token, message: 'User created successfully' });
+    res.status(201).json({ authToken, message: 'User created successfully' });
   } catch (error) {
     console.error('Error during signup:', error);
     res.status(500).json({ message: 'Server error' });
@@ -140,9 +140,9 @@ app.post('/login', async (req, res) => {
     }
 
     // Generate a JWT token
-    const authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(200).json({ token, message: 'Login successful' });
+    res.status(200).json({ authToken, message: 'Login successful' });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Server error' });

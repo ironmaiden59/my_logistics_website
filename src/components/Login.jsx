@@ -38,7 +38,7 @@ const Login = () => {
       const userId = decodedToken.userId;
 
       // Update the authentication state
-      login({ userId });
+      login(authToken);
 
       // Optionally navigate to the profile page or another page
       navigate('/profile');

@@ -45,7 +45,7 @@ const SignUp = () => {
       const userId = decodedToken.userId;
 
       // Update the authentication state
-      login({ userId }); // This will update the isAuthenticated state in the AuthContext
+      login(authToken); // This will update the isAuthenticated state in the AuthContext
 
       // Show a success message (optional)
       alert('Sign-up successful!');

@@ -18,7 +18,7 @@ const UserInfoForm = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get('http://localhost:5000/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ const UserInfoForm = () => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       await axios.put('http://localhost:5000/user/profile', userInfo, {
         headers: {
           Authorization: `Bearer ${token}`

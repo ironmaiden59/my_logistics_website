@@ -26,14 +26,27 @@ const RespondToBuyer = () => {
     const authToken = localStorage.getItem('authToken'); // Assuming token is stored in localStorage
 
     if (authToken) {
-      const decodedToken = jwtDecode(authToken);
-      setUserId(decodedToken.userId);
-      setIsAuthenticated(true);
+      try {
+        const decodedToken = jwtDecode(authToken);
+        setUserId(decodedToken.userId);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Invalid auth token:', error);
+        localStorage.removeItem('authToken');
+        setIsAuthenticated(false);
+        setUserId(null);
+        // Redirect to login/signup
+        navigate(
+          `/signup?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
+        );
+      }
     } else {
       // Redirect to sign-up or login page if not authenticated
-      navigate(`/signup?redirect=/respond-to-buyer/${id}?token=${token}`);
+      navigate(
+        `/signup?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
+      );
     }
-  }, [id, token, navigate]);
+  }, [navigate]);
 
   // Initialize WebSocket connection
   useEffect(() => {

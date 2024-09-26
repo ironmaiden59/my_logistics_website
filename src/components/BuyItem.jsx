@@ -22,7 +22,8 @@ const BuyItem = () => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        setItems(response.data);
+        const userItems = response.data.filter(item => item.userId === userId);
+        setItems(userItems);
       } catch (err) {
         console.error('Error fetching items:', err.response?.data || err.message);
       }

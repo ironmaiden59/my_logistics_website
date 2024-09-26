@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -11,9 +11,14 @@ const Login = () => {
     password: '',
   });
 
+  const location = useLocation();
   const [error, setError] = useState(null); // State for handling errors
   const { login } = useContext(AuthContext);
   const navigate = useNavigate(); // Hook for navigation
+
+  // Extract redirect parameter
+const queryParams = new URLSearchParams(location.search);
+const redirectPath = queryParams.get('redirect') || '/profile'; // Default to '/profile' if not specified
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +46,7 @@ const Login = () => {
       login(authToken);
 
       // Optionally navigate to the profile page or another page
-      navigate('/profile');
+      navigate(redirectPath);
 
       setError(null); // Clear any previous errors
     } catch (err) {

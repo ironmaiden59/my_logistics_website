@@ -1,10 +1,11 @@
 const express = require('express');
+const authenticateToken = require('../middleware/authenticateToken');
 const { Token, Item } = require('../models');
 const { Message } = require('../models');
 const router = express.Router();
 
 // Get all messages for a specific item
-router.get('/item/:itemId', async (req, res) => {
+router.get('/item/:itemId', authenticateToken, async (req, res) => {
   const { itemId } = req.params;
 
   try {
@@ -20,7 +21,7 @@ router.get('/item/:itemId', async (req, res) => {
 });
 
 // Send a new message
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   const { content, senderId, receiverId, itemId, senderName } = req.body;
 
   // Validate that all required fields are present
@@ -56,7 +57,7 @@ router.post('/validate-token', async (req, res) => {
     const validToken = await Token.findOne({ where: { token }, include: [Item] });
 
     if (validToken) {
-      res.json({ valid: true, item: validToken.Item });
+      res.json({ valid: true, item: validToken.Item, buyerId: validToken.buyerId });
     } else {
       res.status(401).json({ valid: false, message: 'Invalid token' });
     }

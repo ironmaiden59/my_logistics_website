@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    console.log('AuthToken from localStorage:', authToken);
+    
     if (authToken) {
       try {
         const decodedToken = jwtDecode(authToken);
@@ -40,8 +40,11 @@ export const AuthProvider = ({ children }) => {
     setUserId(null);
   };
 
+    // Determine if the user is authenticated
+    const isAuthenticated = !!userId;
+
   return (
-    <AuthContext.Provider value={{ authToken, userId, login, logout }}>
+    <AuthContext.Provider value={{ authToken, userId, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

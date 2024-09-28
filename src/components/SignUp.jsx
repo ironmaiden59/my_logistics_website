@@ -20,7 +20,7 @@ const SignUp = () => {
 
   // Extract the redirect query parameter
   const queryParams = new URLSearchParams(location.search);
-  const redirect = queryParams.get('redirect') || '/'; // Default to home if no redirect is provided
+  const redirectPath = queryParams.get('redirect') || '/profile'; // Default to home if no redirect is provided
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +51,7 @@ const SignUp = () => {
       alert('Sign-up successful!');
 
       // Redirect to the originally intended page
-      navigate(redirect);
+      navigate(redirectPath);
 
     } catch (err) {
       console.error('Error signing up:', err.response?.data || err.message);
@@ -136,7 +136,8 @@ const SignUp = () => {
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
           Already have an account?{' '}
-          <a href="/login" className="text-teal-600 hover:underline">
+          <a href={`/login?redirect=${encodeURIComponent(redirectPath)}`}
+    className="text-teal-600 hover:underline">
             Log In
             </a>
         </p>

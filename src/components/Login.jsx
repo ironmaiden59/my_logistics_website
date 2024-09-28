@@ -103,7 +103,8 @@ const redirectPath = queryParams.get('redirect') || '/profile'; // Default to '/
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
           Don't have an account?{' '}
-          <a href="/signup" className="text-teal-600 hover:underline">
+          <a href={`/signup?redirect=${encodeURIComponent(redirectPath)}`}
+    className="text-teal-600 hover:underline">
             Sign Up
             </a>
         </p>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback  } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -12,7 +12,7 @@ const RespondToBuyer = () => {
   const [senderName, setSenderName] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   const [isValidToken, setIsValidToken] = useState(false);
   const [socket, setSocket] = useState(null);
   const [userId, setUserId] = useState(null); // Initialize userId state
@@ -29,24 +29,22 @@ const RespondToBuyer = () => {
       try {
         const decodedToken = jwtDecode(authToken);
         setUserId(decodedToken.userId);
-        setIsAuthenticated(true);
       } catch (error) {
         console.error('Invalid auth token:', error);
         localStorage.removeItem('authToken');
-        setIsAuthenticated(false);
         setUserId(null);
-        // Redirect to login/signup
+        // Redirect to login page with redirect parameter
         navigate(
-          `/signup?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
+          `/login?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
         );
       }
     } else {
-      // Redirect to sign-up or login page if not authenticated
+      // Redirect to login page if not authenticated
       navigate(
-        `/signup?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
+        `/login?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
       );
     }
-  }, [navigate]);
+  }, [navigate, id, token]);
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -103,14 +101,19 @@ const RespondToBuyer = () => {
   }, [id, socket, token]);
 
   // Fetch messages related to the item
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
-      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`);
+      const authToken = localStorage.getItem('authToken');
+      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       setMessages(messagesResponse.data);
     } catch (err) {
       console.error('Error fetching messages:', err.response?.data || err.message);
     }
-  };
+  }, [id]);
 
   // Send new message via WebSocket
   const handleMessageSend = () => {

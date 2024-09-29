@@ -59,13 +59,22 @@ const RespondToBuyer = () => {
   useEffect(() => {
     const validateTokenAndFetchItem = async () => {
       try {
+        const authToken = localStorage.getItem('authToken');
         const response = await axios.post('http://localhost:5000/messages/validate-token', {
           token: token, // Send the token extracted from the URL
+        }, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
         });
 
         if (response.data.valid) {
           setIsValidToken(true); // Mark token as valid
           setItem(response.data.item); // Set the item data
+
+          // Associate the item with the user
+          await associateItemWithUser(response.data.item.id);
+
           fetchMessages(); // Fetch messages after token validation
         } else {
           console.error('Invalid token');
@@ -99,6 +108,20 @@ const RespondToBuyer = () => {
       if (socketCleanup) socketCleanup();
     };
   }, [id, socket, token]);
+
+  // Function to associate item with the user
+  const associateItemWithUser = async (itemId) => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      await axios.post('http://localhost:5000/users/associate-item', { itemId }, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (err) {
+      console.error('Error associating item with user:', err.response?.data || err.message);
+    }
+  };
 
   // Fetch messages related to the item
   const fetchMessages = useCallback(async () => {

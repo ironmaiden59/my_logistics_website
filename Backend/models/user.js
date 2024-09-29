@@ -4,7 +4,11 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // define association here if needed
+        // Many-to-Many association
+  User.belongsToMany(models.Item, { through: models.UserItem, foreignKey: 'userId' });
+  
+  // One-to-Many association (User owns Items)
+  User.hasMany(models.Item, { foreignKey: 'userId', as: 'items' });
     }
   }
   User.init({

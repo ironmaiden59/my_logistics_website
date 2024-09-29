@@ -3,7 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');
-const { User } = require('./models'); // Import User model
+const { User, Item, UserItem } = require('./models'); // Import User model
 const itemRoutes = require('./routes/items');
 const cors = require('cors');
 const session = require('express-session');
@@ -216,39 +216,48 @@ app.put('/user/password', authenticateToken, async (req, res) => {
   }
 });
 
-// Preferences endpoint
-app.get('/user/preferences', authenticateToken, async (req, res) => {
+app.post('/users/associate-item', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    const { itemId } = req.body;
+    const userId = req.user.userId; // Assuming your auth middleware sets req.user
 
-    res.status(200).json({
-      receiveNotifications: user.receiveNotifications || false,
-      preferredDeliveryOption: user.preferredDeliveryOption || 'standard'
-    });
+    // Create an association between the user and the item
+    await UserItem.findOrCreate({ where: { userId, itemId } });
+
+    res.json({ success: true });
   } catch (error) {
-    console.error('Error fetching preferences:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error associating item with user:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-app.put('/user/preferences', authenticateToken, async (req, res) => {
-  const { receiveNotifications, preferredDeliveryOption } = req.body;
-
+// Define the route to fetch items associated with the authenticated user
+app.get('/users/items', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    const userId = req.user.userId; // Assuming your authentication middleware sets req.user
 
-    await user.update({ receiveNotifications, preferredDeliveryOption });
+    // Fetch items the user owns (items they're selling)
+    const sellingItems = await Item.findAll({
+      where: { userId },
+    });
 
-    res.status(200).json({ message: 'Preferences updated successfully' });
+    // Fetch items the user is interested in (items they've associated with via UserItem)
+    const buyingItems = await UserItem.findAll({
+      where: { userId },
+      include: [{ model: Item }],
+    });
+
+    // Extract the items from buyingItems
+    const interestedItems = buyingItems.map(userItem => userItem.Item);
+
+    // Combine the results
+    res.json({
+      sellingItems,
+      interestedItems,
+    });
   } catch (error) {
-    console.error('Error updating preferences:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching user items:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

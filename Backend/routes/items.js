@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const { Token, Item, User } = require('../models'); // Import both Item and User models
 const router = express.Router();
 const authenticateToken = require('../middleware/authenticateToken');
+const app = express();
 
 // Generate a unique token and send a link to the seller
 router.get('/:id/generate-link', authenticateToken, async (req, res) => {

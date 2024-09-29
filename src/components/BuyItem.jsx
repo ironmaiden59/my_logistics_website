@@ -8,29 +8,36 @@ const BuyItem = () => {
   const navigate = useNavigate(); // Initialize navigate
   const { userId } = useContext(AuthContext);
   const [items, setItems] = useState([]);
+  const [sellingItems, setSellingItems] = useState([]);
+  const [buyingItems, setBuyingItems] = useState([]);
 
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchUserItems = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
         if (!authToken) {
-          navigate('/login'); // Import and use `useNavigate` from 'react-router-dom'
+          navigate('/login');
           return;
         }
-        const response = await axios.get('http://localhost:5000/items', {
+        const response = await axios.get('http://localhost:5000/users/items', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        const userItems = response.data.filter(item => item.userId === userId);
-        setItems(userItems);
+  
+        // Extract sellingItems and interestedItems from response.data
+        const { sellingItems, interestedItems } = response.data;
+  
+        // Update state variables
+        setSellingItems(sellingItems);
+        setBuyingItems(interestedItems);
       } catch (err) {
-        console.error('Error fetching items:', err.response?.data || err.message);
+        console.error('Error fetching user items:', err.response?.data || err.message);
       }
     };
-
-    fetchItems();
-  }, []);
+  
+    fetchUserItems();
+  }, [navigate]);
 
   const handleDelete = async (id) => {
     try {
@@ -40,7 +47,7 @@ const BuyItem = () => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      setItems((prevItems) => prevItems.filter(item => item.id !== id));
+      setSellingItems((prevItems) => prevItems.filter(item => item.id !== id));
     } catch (err) {
       console.error('Error deleting item:', err.response?.data || err.message);
     }
@@ -54,10 +61,13 @@ const BuyItem = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
       >
-        Buy Items
+        My Items
       </motion.h2>
+  
+      {/* Items I'm Selling */}
+      <h3 className="text-2xl font-semibold mt-6">Items I'm Selling</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {items.map((item, index) => (
+        {sellingItems.map((item, index) => (
           <motion.div
             key={index}
             className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
@@ -78,8 +88,25 @@ const BuyItem = () => {
           </motion.div>
         ))}
       </div>
+  
+      {/* Items I'm Interested In */}
+      <h3 className="text-2xl font-semibold mt-6">Items I'm Interested In</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {buyingItems.map((item, index) => (
+          <motion.div
+            key={index}
+            className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+            whileHover={{ scale: 1.02 }}
+          >
+            <Link to={`/items/${item.id}`}>
+              <h3 className="text-lg font-bold mb-2 text-gray-800">{item.name}</h3>
+              <p className="text-teal-600 font-bold mt-2">${item.price}</p>
+            </Link>
+            {/* You can add actions specific to buying items here */}
+          </motion.div>
+        ))}
+      </div>
     </div>
-  );
-};
+)};
 
 export default BuyItem;

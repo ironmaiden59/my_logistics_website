@@ -219,9 +219,12 @@ app.put('/user/password', authenticateToken, async (req, res) => {
 app.post('/users/associate-item', authenticateToken, async (req, res) => {
   try {
     const { itemId } = req.body;
-    const userId = req.user.userId; // Assuming your auth middleware sets req.user
+    console.log('Request body itemId:', itemId); // Debugging
 
-    // Create an association between the user and the item
+    const userId = req.user.userId;
+    console.log('User ID from token:', userId); // Debugging
+
+    // Proceed with creating the association
     await UserItem.findOrCreate({ where: { userId, itemId } });
 
     res.json({ success: true });
@@ -234,23 +237,28 @@ app.post('/users/associate-item', authenticateToken, async (req, res) => {
 // Define the route to fetch items associated with the authenticated user
 app.get('/users/items', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.userId; // Assuming your authentication middleware sets req.user
+    const userId = req.user.userId;
 
-    // Fetch items the user owns (items they're selling)
-    const sellingItems = await Item.findAll({
-      where: { userId },
+    const user = await User.findByPk(userId, {
+      include: [
+        {
+          model: Item,
+          as: 'items', // Alias for items the user is selling
+        },
+        {
+          model: Item,
+          as: 'interestedItems', // Alias for items the user is interested in
+        },
+      ],
     });
 
-    // Fetch items the user is interested in (items they've associated with via UserItem)
-    const buyingItems = await UserItem.findAll({
-      where: { userId },
-      include: [{ model: Item }],
-    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    // Extract the items from buyingItems
-    const interestedItems = buyingItems.map(userItem => userItem.Item);
+    const sellingItems = user.items;
+    const interestedItems = user.interestedItems;
 
-    // Combine the results
     res.json({
       sellingItems,
       interestedItems,

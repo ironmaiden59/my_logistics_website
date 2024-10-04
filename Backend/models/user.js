@@ -5,10 +5,16 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
         // Many-to-Many association
-  User.belongsToMany(models.Item, { through: models.UserItem, foreignKey: 'userId' });
-  
-  // One-to-Many association (User owns Items)
-  User.hasMany(models.Item, { foreignKey: 'userId', as: 'items' });
+        User.belongsToMany(models.Item, {
+          through: models.UserItem,
+          foreignKey: 'userId',
+          as: 'interestedItems', // Alias for items the user is interested in
+        });
+        
+        User.hasMany(models.Item, {
+          foreignKey: 'userId',
+          as: 'items', // Alias for items the user is selling
+        });
     }
   }
   User.init({

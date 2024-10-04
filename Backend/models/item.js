@@ -5,10 +5,16 @@ module.exports = (sequelize, DataTypes) => {
   class Item extends Model {
     static associate(models) {
         // Many-to-Many association
-  Item.belongsToMany(models.User, { through: models.UserItem, foreignKey: 'itemId' });
-  
-  // One-to-Many association (Item belongs to User)
-  Item.belongsTo(models.User, { foreignKey: 'userId', as: 'owner' });
+        Item.belongsToMany(models.User, {
+          through: models.UserItem,
+          foreignKey: 'itemId',
+          as: 'interestedUsers', // Alias for users interested in the item
+        });
+        
+        Item.belongsTo(models.User, {
+          foreignKey: 'userId',
+          as: 'seller', // Use 'seller' to match your include
+        });
     }
   }
 

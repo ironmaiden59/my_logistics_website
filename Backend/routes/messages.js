@@ -1,6 +1,6 @@
 const express = require('express');
 const authenticateToken = require('../middleware/authenticateToken');
-const { Token, Item } = require('../models');
+const { Token, Item, User } = require('../models');
 const { Message } = require('../models');
 const router = express.Router();
 
@@ -11,7 +11,24 @@ router.get('/item/:itemId', authenticateToken, async (req, res) => {
   try {
     const messages = await Message.findAll({
       where: { itemId },
-      order: [['createdAt', 'ASC']], // Show messages in ascending order
+      include: [
+        {
+          model: User,
+          as: 'sender',
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+        {
+          model: User,
+          as: 'receiver',
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+        {
+          model: Item,
+          as: 'item',
+          attributes: ['id', 'name', 'price'],
+        },
+      ],
+      order: [['createdAt', 'ASC']],
     });
     res.json(messages);
   } catch (error) {

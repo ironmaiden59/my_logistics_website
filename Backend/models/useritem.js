@@ -25,8 +25,8 @@ module.exports = (sequelize, DataTypes) => {
 
   UserItem.associate = function(models) {
     // Associations
-    UserItem.belongsTo(models.User, { foreignKey: 'userId' });
-    UserItem.belongsTo(models.Item, { foreignKey: 'itemId' });
+    UserItem.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
+    UserItem.belongsTo(models.Item, { foreignKey: 'itemId', as: 'item' });
   };
 
   return UserItem;

@@ -7,6 +7,7 @@ const { User, Item, UserItem } = require('./models'); // Import User model
 const itemRoutes = require('./routes/items');
 const cors = require('cors');
 const session = require('express-session');
+const { Message } = require('./models');
 const messageRoutes = require('./routes/messages');
 const authenticateToken = require('./middleware/authenticateToken');
 
@@ -73,9 +74,24 @@ sequelize.authenticate()
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
-  socket.on('sendMessage', (messageData) => {
-    // Broadcast the message to other clients
-    io.emit('newMessage', messageData);
+  socket.on('sendMessage', async (messageData) => {
+    try {
+      // Save the message to the database
+      const newMessage = await Message.create({
+        content: messageData.content,
+        senderId: messageData.senderId,
+        receiverId: messageData.receiverId,
+        itemId: messageData.itemId,
+        senderName: messageData.senderName || 'Anonymous',
+        date: new Date(), // Use Sequelize default if configured
+      });
+
+      // Broadcast the saved message to other clients
+      io.emit('newMessage', newMessage);
+    } catch (error) {
+      console.error('Error saving message:', error);
+      // Optionally emit an error back to the client
+    }
   });
 
   socket.on('disconnect', () => {

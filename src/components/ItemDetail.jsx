@@ -97,26 +97,23 @@ useEffect(() => {
 // Send new message via WebSocket
 const handleMessageSend = () => {
   if (!newMessage.trim() || !buyerId) {
-    return; // Do not send an empty message or allow unauthenticated users to send messages
+    return;
   }
 
   const messageData = {
     content: newMessage,
-    senderId: buyerId, // Use the actual buyerId
-    receiverId: item.userId, // Seller's userId
+    senderId: buyerId, // For buyer
+    receiverId: item.userId, // For seller
     itemId: id,
+    senderName: 'Buyer Name', // Or fetch from user data
   };
 
-  // Clear the message input before emitting
   setNewMessage('');
 
-  // Emit the message via WebSocket
   if (socket) {
     socket.emit('sendMessage', messageData, (error) => {
       if (error) {
         console.error('Error sending message:', error);
-      } else {
-        // Optionally handle any post-send success action here
       }
     });
   } else {

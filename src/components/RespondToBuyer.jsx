@@ -12,7 +12,7 @@ const RespondToBuyer = () => {
   const [senderName, setSenderName] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  
+  const [buyerId, setBuyerId] = useState(null);
   const [isValidToken, setIsValidToken] = useState(false);
   const [socket, setSocket] = useState(null);
   const [userId, setUserId] = useState(null); // Initialize userId state
@@ -20,6 +20,21 @@ const RespondToBuyer = () => {
   // Extract token from the query parameters
   const queryParams = new URLSearchParams(location.search); // Use location.search
   const token = queryParams.get('token');
+
+    // Fetch messages related to the item
+    const fetchMessages = useCallback(async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        setMessages(messagesResponse.data);
+      } catch (err) {
+        console.error('Error fetching messages:', err.response?.data || err.message);
+      }
+    }, [id]);
 
   // Check authentication and get userId
   useEffect(() => {
@@ -55,6 +70,20 @@ const RespondToBuyer = () => {
     return () => newSocket.close();
   }, []);
 
+  // Function to associate item with the user
+  const associateItemWithUser = async (itemId) => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      await axios.post('http://localhost:5000/users/associate-item', { itemId }, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (err) {
+      console.error('Error associating item with user:', err.response?.data || err.message);
+    }
+  };
+
   // Fetch item and validate token on component mount
   useEffect(() => {
     const validateTokenAndFetchItem = async () => {
@@ -71,6 +100,7 @@ const RespondToBuyer = () => {
         if (response.data.valid) {
           setIsValidToken(true); // Mark token as valid
           setItem(response.data.item); // Set the item data
+          setBuyerId(response.data.buyerId);
 
           // Associate the item with the user
           await associateItemWithUser(response.data.item.id);
@@ -107,55 +137,25 @@ const RespondToBuyer = () => {
     return () => {
       if (socketCleanup) socketCleanup();
     };
-  }, [id, socket, token]);
+  }, [id, socket, token, fetchMessages, associateItemWithUser]);
 
-  // Function to associate item with the user
-  const associateItemWithUser = async (itemId) => {
-    try {
-      const authToken = localStorage.getItem('authToken');
-      await axios.post('http://localhost:5000/users/associate-item', { itemId }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-    } catch (err) {
-      console.error('Error associating item with user:', err.response?.data || err.message);
-    }
-  };
-
-  // Fetch messages related to the item
-  const fetchMessages = useCallback(async () => {
-    try {
-      const authToken = localStorage.getItem('authToken');
-      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      setMessages(messagesResponse.data);
-    } catch (err) {
-      console.error('Error fetching messages:', err.response?.data || err.message);
-    }
-  }, [id]);
 
   // Send new message via WebSocket
   const handleMessageSend = () => {
-    if (!newMessage.trim() || !userId) {
-      return; // Do not send an empty message or if user is not authenticated
+    if (!newMessage.trim() || !buyerId) {
+      return;
     }
-
+  
     const messageData = {
       content: newMessage,
       senderName: senderName || 'Anonymous',
-      senderId: userId, // Use the actual userId
-      receiverId: item?.buyerId, // Ensure this is set appropriately
+      senderId: userId,   // Seller's userId
+      receiverId: buyerId, // Buyer's userId obtained from the token
       itemId: id,
     };
-
-    // Clear the message input before emitting
+  
     setNewMessage('');
-
-    // Emit the message via WebSocket
+  
     if (socket) {
       socket.emit('sendMessage', messageData, (error) => {
         if (error) {
@@ -167,7 +167,7 @@ const RespondToBuyer = () => {
     }
   };
 
-  if (!isValidToken) {
+  if (!isValidToken || buyerId === null) {
     return <p>Loading...</p>; // Show loading or handle invalid token
   }
 

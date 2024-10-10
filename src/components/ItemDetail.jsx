@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -13,6 +13,13 @@ const ItemDetail = () => {
   const [generatedLink, setGeneratedLink] = useState('');
   const [socket, setSocket] = useState(null); // Socket.IO instance
   const [buyerId, setBuyerId] = useState(null);
+
+  const messageListRef = useRef(null);
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages]);
 
  // Authentication and buyerId setup
  useEffect(() => {
@@ -138,53 +145,62 @@ const handleMessageSend = () => {
 
   return (
     <div className="item-detail container mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center text-teal-600">{item.name}</h2>
-      <p className="text-teal-600 font-bold mt-2 text-center">Price: ${item.price}</p>
-
-      {parseFloat(item.price) > 100 && (
-        <p className="text-red-600 font-bold mt-2 text-center">
-          Fee: ${fee} | Total: ${total.toFixed(2)}
-        </p>
-      )}
-
-      {/* Message Box at Bottom */}
-      <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg">
-        <div className="max-w-xl mx-auto p-4">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Messages</h3>
-          <div className="message-list h-48 overflow-y-auto bg-gray-100 p-3 rounded-lg">
-            {messages.map((message, index) => (
-              <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
-                <p>{message.content}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <textarea
-              className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
-              placeholder="Write a message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-            ></textarea>
-
-            <button
-              className="w-full bg-teal-500 text-white py-2 rounded-full hover:bg-teal-600 transition-colors"
-              onClick={handleMessageSend}
-            >
-              Send Message
-            </button>
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Column - Item Details */}
+        <div className="w-full lg:w-2/3 pr-0 lg:pr-4">
+          <h2 className="text-3xl font-bold mb-6 text-teal-600">{item.name}</h2>
+          <p className="text-teal-600 font-bold mt-2">Price: ${item.price}</p>
+  
+          {parseFloat(item.price) > 100 && (
+            <p className="text-red-600 font-bold mt-2">
+              Fee: ${fee} | Total: ${total.toFixed(2)}
+            </p>
+          )}
+  
+          {/* Generated Link */}
+          <div className="mt-8">
+            <p className="text-gray-700">Copy and send this link to the seller:</p>
+            <input
+              type="text"
+              value={generatedLink}
+              readOnly
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg text-center focus:ring-teal-500 focus:border-teal-500"
+            />
           </div>
         </div>
-      </div>
-
-      <div className="mt-8 text-center">
-        <p className="text-gray-700">Copy and send this link to the seller:</p>
-        <input
-          type="text"
-          value={generatedLink}
-          readOnly
-          className="w-full max-w-xl mx-auto p-3 mt-2 border border-gray-300 rounded-lg text-center focus:ring-teal-500 focus:border-teal-500"
-        />
+  
+        {/* Right Column - Messaging */}
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white shadow-lg p-4">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Messages</h3>
+            <div
+              className="message-list h-96 overflow-y-auto bg-gray-100 p-3 rounded-lg"
+              ref={messageListRef}
+            >
+              {messages.map((message, index) => (
+                <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
+                  <p>{message.content}</p>
+                </div>
+              ))}
+            </div>
+  
+            <div className="mt-4">
+              <textarea
+                className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
+                placeholder="Write a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+              ></textarea>
+  
+              <button
+                className="w-full bg-teal-500 text-white py-2 rounded-full hover:bg-teal-600 transition-colors"
+                onClick={handleMessageSend}
+              >
+                Send Message
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

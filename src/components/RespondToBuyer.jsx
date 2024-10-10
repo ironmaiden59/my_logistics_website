@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback  } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -20,6 +20,14 @@ const RespondToBuyer = () => {
   // Extract token from the query parameters
   const queryParams = new URLSearchParams(location.search); // Use location.search
   const token = queryParams.get('token');
+  const messageListRef = useRef(null);
+
+  // Scroll to latest message
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -170,64 +178,65 @@ const RespondToBuyer = () => {
     return <p>Loading...</p>; // Show loading or handle invalid token
   }
 
- // Calculate the fee and total
- const price = parseFloat(item.price) || 0;
- const fee = price > 100 ? 15.99 : 0;
- const total = price + fee;
-
-  // Debugging logs
-  console.log('Item Price:', item.price);
-  console.log('Parsed Price:', price);
-  console.log('Fee:', fee);
-  console.log('Total:', total);
+  // Calculate the fee and total
+  const fee = parseFloat(item?.price) > 100 ? 15.99 : 0;
+  const total = parseFloat(item?.price) + fee;
 
   return (
-    <div className="respond-to-buyer container mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center text-teal-600">{item.name}</h2>
-     <p className="text-teal-600 font-bold mt-2 text-center">Price: ${price.toFixed(2)}</p>
-
-     {price > 100 && (
-      <p className="text-red-600 font-bold mt-2 text-center">
-      Fee: ${fee.toFixed(2)} | Total: ${total.toFixed(2)}
-     </p>
-     )}
-
-      {/* Message Box at Bottom */}
-      <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg">
-        <div className="max-w-xl mx-auto p-4">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Messages</h3>
-          <div className="message-list h-48 overflow-y-auto bg-gray-100 p-3 rounded-lg">
-            {messages.map((message, index) => (
-              <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
-                <p>
-                  <strong>{message.senderName}:</strong> {message.content}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <input
-              type="text"
-              className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
-              placeholder="Enter your name"
-              value={senderName}
-              onChange={(e) => setSenderName(e.target.value)}
-            />
-
-            <textarea
-              className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
-              placeholder="Write a message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-            ></textarea>
-
-            <button
-              className="w-full bg-teal-500 text-white py-2 rounded-full hover:bg-teal-600 transition-colors"
-              onClick={handleMessageSend}
+    <div className="item-detail container mx-auto p-6">
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Column - Item Details */}
+        <div className="w-full lg:w-2/3 pr-0 lg:pr-4">
+          <h2 className="text-3xl font-bold mb-6 text-teal-600">{item.name}</h2>
+          <p className="text-teal-600 font-bold mt-2">Price: ${item.price}</p>
+  
+          {parseFloat(item.price) > 100 && (
+            <p className="text-red-600 font-bold mt-2">
+              Fee: ${fee} | Total: ${total.toFixed(2)}
+            </p>
+          )}
+        </div>
+  
+        {/* Right Column - Messaging */}
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white shadow-lg p-4">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Messages</h3>
+            <div
+              className="message-list h-96 overflow-y-auto bg-gray-100 p-3 rounded-lg"
+              ref={messageListRef}
             >
-              Send Message
-            </button>
+              {messages.map((message, index) => (
+                <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
+                  <p>
+                    <strong>{message.senderName}:</strong> {message.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+  
+            <div className="mt-4">
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
+                placeholder="Enter your name"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+              />
+  
+              <textarea
+                className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
+                placeholder="Write a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+              ></textarea>
+  
+              <button
+                className="w-full bg-teal-500 text-white py-2 rounded-full hover:bg-teal-600 transition-colors"
+                onClick={handleMessageSend}
+              >
+                Send Message
+              </button>
+            </div>
           </div>
         </div>
       </div>

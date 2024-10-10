@@ -166,24 +166,31 @@ const RespondToBuyer = () => {
     }
   };
 
-  if (!isValidToken || buyerId === null) {
+  if (!isValidToken || buyerId === null || !item) {
     return <p>Loading...</p>; // Show loading or handle invalid token
   }
 
-  // Calculate the fee and total
-  const fee = parseFloat(item?.price) > 100 ? 15.99 : 0;
-  const total = parseFloat(item?.price || 0) + fee;
+ // Calculate the fee and total
+ const price = parseFloat(item.price) || 0;
+ const fee = price > 100 ? 15.99 : 0;
+ const total = price + fee;
+
+  // Debugging logs
+  console.log('Item Price:', item.price);
+  console.log('Parsed Price:', price);
+  console.log('Fee:', fee);
+  console.log('Total:', total);
 
   return (
     <div className="respond-to-buyer container mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center text-teal-600">{item?.name}</h2>
-      <p className="text-teal-600 font-bold mt-2 text-center">Price: ${item?.price}</p>
+      <h2 className="text-3xl font-bold mb-6 text-center text-teal-600">{item.name}</h2>
+     <p className="text-teal-600 font-bold mt-2 text-center">Price: ${price.toFixed(2)}</p>
 
-      {parseFloat(item?.price) > 100 && (
-        <p className="text-red-600 font-bold mt-2 text-center">
-          Fee: ${fee} | Total: ${total.toFixed(2)}
-        </p>
-      )}
+     {price > 100 && (
+      <p className="text-red-600 font-bold mt-2 text-center">
+      Fee: ${fee.toFixed(2)} | Total: ${total.toFixed(2)}
+     </p>
+     )}
 
       {/* Message Box at Bottom */}
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg">

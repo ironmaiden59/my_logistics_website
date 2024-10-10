@@ -21,24 +21,40 @@ const RespondToBuyer = () => {
   const queryParams = new URLSearchParams(location.search); // Use location.search
   const token = queryParams.get('token');
 
-    // Fetch messages related to the item
-    const fetchMessages = useCallback(async () => {
-      try {
-        const authToken = localStorage.getItem('authToken');
-        const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+  const fetchMessages = useCallback(async () => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      setMessages(messagesResponse.data);
+    } catch (err) {
+      console.error('Error fetching messages:', err.response?.data || err.message);
+    }
+  }, [id]);
+
+  const associateItemWithUser = useCallback(async (itemId) => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      await axios.post(
+        'http://localhost:5000/users/associate-item',
+        { itemId },
+        {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        });
-        setMessages(messagesResponse.data);
-      } catch (err) {
-        console.error('Error fetching messages:', err.response?.data || err.message);
-      }
-    }, [id]);
+        }
+      );
+    } catch (err) {
+      console.error('Error associating item with user:', err.response?.data || err.message);
+    }
+  }, []);
 
   // Check authentication and get userId
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken'); // Assuming token is stored in localStorage
+    const authToken = localStorage.getItem('authToken');
 
     if (authToken) {
       try {
@@ -48,13 +64,11 @@ const RespondToBuyer = () => {
         console.error('Invalid auth token:', error);
         localStorage.removeItem('authToken');
         setUserId(null);
-        // Redirect to login page with redirect parameter
         navigate(
           `/login?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
         );
       }
     } else {
-      // Redirect to login page if not authenticated
       navigate(
         `/login?redirect=${encodeURIComponent(`/respond-to-buyer/${id}?token=${token}`)}`
       );
@@ -70,41 +84,27 @@ const RespondToBuyer = () => {
     return () => newSocket.close();
   }, []);
 
-  // Function to associate item with the user
-  const associateItemWithUser = async (itemId) => {
-    try {
-      const authToken = localStorage.getItem('authToken');
-      await axios.post('http://localhost:5000/users/associate-item', { itemId }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-    } catch (err) {
-      console.error('Error associating item with user:', err.response?.data || err.message);
-    }
-  };
-
   // Fetch item and validate token on component mount
   useEffect(() => {
     const validateTokenAndFetchItem = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
         const response = await axios.post('http://localhost:5000/messages/validate-token', {
-          token: token, // Send the token extracted from the URL
+          token: token,
         }, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-
+  
         if (response.data.valid) {
-          setIsValidToken(true); // Mark token as valid
-          setItem(response.data.item); // Set the item data
+          setIsValidToken(true);
+          setItem(response.data.item);
           setBuyerId(response.data.buyerId);
-
+  
           // Associate the item with the user
           await associateItemWithUser(response.data.item.id);
-
+  
           fetchMessages(); // Fetch messages after token validation
         } else {
           console.error('Invalid token');
@@ -113,31 +113,30 @@ const RespondToBuyer = () => {
         console.error('Error validating token:', error);
       }
     };
-
+  
     if (id && token) {
       validateTokenAndFetchItem();
     }
+  }, [id, token, fetchMessages, associateItemWithUser]);
 
-    let socketCleanup;
-    if (socket) {
-      // Listen for new messages
-      socket.on('newMessage', (message) => {
-        if (message.itemId === id) {
+  // Set up socket listeners
+  useEffect(() => {
+    if (socket && id) {
+      socket.emit('joinItemRoom', id);
+
+      const handleNewMessage = (message) => {
+        if (message.itemId.toString() === id.toString()) {
           setMessages((prevMessages) => [...prevMessages, message]);
         }
-      });
+      };
 
-      // Prepare the cleanup function
-      socketCleanup = () => {
-        socket.off('newMessage');
+      socket.on('newMessage', handleNewMessage);
+
+      return () => {
+        socket.off('newMessage', handleNewMessage);
       };
     }
-
-    // Return the cleanup function
-    return () => {
-      if (socketCleanup) socketCleanup();
-    };
-  }, [id, socket, token, fetchMessages, associateItemWithUser]);
+  }, [socket, id]);
 
 
   // Send new message via WebSocket

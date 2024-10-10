@@ -12,41 +12,52 @@ const ItemDetail = () => {
   const [newMessage, setNewMessage] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
   const [socket, setSocket] = useState(null); // Socket.IO instance
+  const [buyerId, setBuyerId] = useState(null);
 
-// Initialize buyerId
-let buyerId = null;
-const authToken = localStorage.getItem('authToken');
-if (authToken) {
-  const decodedToken = jwtDecode(authToken);
-  buyerId = decodedToken.userId;
-}
+ // Authentication and buyerId setup
+ useEffect(() => {
+  const authToken = localStorage.getItem('authToken');
 
-// Redirect to login if not authenticated
-useEffect(() => {
-  if (!authToken) {
+  if (authToken) {
+    try {
+      const decodedToken = jwtDecode(authToken);
+      setBuyerId(decodedToken.userId);
+    } catch (error) {
+      console.error('Invalid auth token:', error);
+      localStorage.removeItem('authToken');
+      setBuyerId(null);
+      navigate('/login');
+    }
+  } else {
     navigate('/login');
   }
-}, [authToken, navigate]);
+}, [navigate]);
 
 // Establish WebSocket connection on component mount
 useEffect(() => {
-  const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
+  const newSocket = io('http://localhost:5000');
   setSocket(newSocket);
+
+  // Emit joinItemRoom event
+  newSocket.emit('joinItemRoom', id);
 
   // Cleanup when the component unmounts
   return () => newSocket.close();
-}, []);
+}, [id]);
 
+// Fetch item and messages
 useEffect(() => {
   const fetchItemAndMessages = async () => {
     try {
+      const authToken = localStorage.getItem('authToken');
+
       // Fetch item by ID
       const itemResponse = await axios.get(`http://localhost:5000/items/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      setItem(itemResponse.data); // Store item in state
+      setItem(itemResponse.data);
 
       // Fetch messages related to the item
       const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
@@ -59,11 +70,9 @@ useEffect(() => {
       // Generate a tokenized link using JWT
       const linkResponse = await axios.get(`http://localhost:5000/items/${id}/generate-link`, {
         headers: {
-          Authorization: `Bearer ${authToken}`, // Include the JWT
+          Authorization: `Bearer ${authToken}`,
         },
       });
-
-      // Set the generated link in state
       setGeneratedLink(linkResponse.data.link);
 
     } catch (err) {
@@ -72,38 +81,36 @@ useEffect(() => {
   };
 
   fetchItemAndMessages();
+}, [id]);
 
-  let socketCleanup;
-  if (socket) {
-    // Listen for new messages
-    socket.on('newMessage', (message) => {
-      if (message.itemId === id) {
+// Set up socket listeners
+useEffect(() => {
+  if (socket && id) {
+    const handleNewMessage = (message) => {
+      if (message.itemId.toString() === id.toString()) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
-    });
+    };
 
-    // Prepare the cleanup function
-    socketCleanup = () => {
-      socket.off('newMessage');
+    socket.on('newMessage', handleNewMessage);
+
+    return () => {
+      socket.off('newMessage', handleNewMessage);
     };
   }
-
-  // Return the cleanup function
-  return () => {
-    if (socketCleanup) socketCleanup();
-  };
-}, [id, socket, authToken]);
+}, [socket, id]);
 
 // Send new message via WebSocket
 const handleMessageSend = () => {
-  if (!newMessage.trim() || !buyerId) {
+  if (!newMessage.trim() || !buyerId || !item || !item.userId) {
+    console.error('Cannot send message: Missing data');
     return;
   }
 
   const messageData = {
     content: newMessage,
-    senderId: buyerId, // For buyer
-    receiverId: item.userId, // For seller
+    senderId: buyerId, // Buyer's userId
+    receiverId: item.userId, // Seller's userId
     itemId: id,
     senderName: 'Buyer Name', // Or fetch from user data
   };

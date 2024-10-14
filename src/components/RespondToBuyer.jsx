@@ -9,7 +9,7 @@ const RespondToBuyer = () => {
   const location = useLocation(); // Get the location object
   const navigate = useNavigate();
   const [item, setItem] = useState(null); // Fetch the item here
-  const [senderName, setSenderName] = useState('');
+  const [sellerFirstName, setSellerFirstName] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [buyerId, setBuyerId] = useState(null);
@@ -83,6 +83,26 @@ const RespondToBuyer = () => {
     }
   }, [navigate, id, token]);
 
+  // Fetch seller's first name
+  useEffect(() => {
+    const fetchSellerFirstName = async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await axios.get('http://localhost:5000/user/profile', {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        setSellerFirstName(response.data.firstName || 'Seller');
+      } catch (err) {
+        console.error('Error fetching user info:', err.response?.data || err.message);
+      }
+    };
+
+    fetchSellerFirstName();
+  }, []);
+
   // Initialize WebSocket connection
   useEffect(() => {
     const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
@@ -155,7 +175,7 @@ const RespondToBuyer = () => {
   
     const messageData = {
       content: newMessage,
-      senderName: senderName || 'Anonymous',
+      senderName: sellerFirstName || 'Seller', // Use the seller's first name
       senderId: userId,   // Seller's userId
       receiverId: buyerId, // Buyer's userId obtained from the token
       itemId: id,
@@ -215,13 +235,7 @@ const RespondToBuyer = () => {
             </div>
   
             <div className="mt-4">
-              <input
-                type="text"
-                className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"
-                placeholder="Enter your name"
-                value={senderName}
-                onChange={(e) => setSenderName(e.target.value)}
-              />
+              
   
               <textarea
                 className="w-full p-2 border rounded-lg focus:ring-teal-500 focus:border-teal-500 mb-2"

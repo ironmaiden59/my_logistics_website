@@ -13,6 +13,7 @@ const ItemDetail = () => {
   const [generatedLink, setGeneratedLink] = useState('');
   const [socket, setSocket] = useState(null); // Socket.IO instance
   const [buyerId, setBuyerId] = useState(null);
+  const [buyerFirstName, setBuyerFirstName] = useState('');
 
   const messageListRef = useRef(null);
   useEffect(() => {
@@ -39,6 +40,26 @@ const ItemDetail = () => {
     navigate('/login');
   }
 }, [navigate]);
+
+// Fetch buyer's first name
+useEffect(() => {
+  const fetchBuyerFirstName = async () => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await axios.get('http://localhost:5000/user/profile', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      setBuyerFirstName(response.data.firstName || 'Buyer');
+    } catch (err) {
+      console.error('Error fetching user info:', err.response?.data || err.message);
+    }
+  };
+
+  fetchBuyerFirstName();
+}, []);
 
 // Establish WebSocket connection on component mount
 useEffect(() => {
@@ -119,7 +140,7 @@ const handleMessageSend = () => {
     senderId: buyerId, // Buyer's userId
     receiverId: item.userId, // Seller's userId
     itemId: id,
-    senderName: 'Buyer Name', // Or fetch from user data
+    senderName: buyerFirstName || 'Buyer', // Use the buyer's first name
   };
 
   setNewMessage('');
@@ -179,7 +200,9 @@ const handleMessageSend = () => {
             >
               {messages.map((message, index) => (
                 <div key={index} className="p-2 mb-2 bg-white rounded-lg shadow">
-                  <p>{message.content}</p>
+                  <p>
+                    <strong>{message.senderName}:</strong> {message.content}
+                    </p>
                 </div>
               ))}
             </div>

@@ -25,7 +25,7 @@ const PasswordManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:5000/user/password', {
+      await axios.put('http://localhost:4000/user/password', {
         currentPassword: passwords.currentPassword,
         newPassword: passwords.newPassword
       }, {

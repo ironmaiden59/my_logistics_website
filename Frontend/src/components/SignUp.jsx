@@ -32,7 +32,7 @@ const SignUp = () => {
 
     try {
       // Send a POST request to the signup endpoint
-      const response = await axios.post('http://localhost:5000/signup', formData);
+      const response = await axios.post('http://localhost:4000/signup', formData);
 
       // Get the authToken from the response
       const { authToken } = response.data;

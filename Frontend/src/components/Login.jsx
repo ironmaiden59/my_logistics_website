@@ -30,7 +30,7 @@ const redirectPath = queryParams.get('redirect') || '/profile'; // Default to '/
 
     try {
       // Send a POST request to the login endpoint
-      const response = await axios.post('http://localhost:5000/login', formData);
+      const response = await axios.post('http://localhost:4000/login', formData);
 
       // Get the authToken from the response
       const { authToken } = response.data;

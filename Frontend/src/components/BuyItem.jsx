@@ -19,7 +19,7 @@ const BuyItem = () => {
           navigate('/login');
           return;
         }
-        const response = await axios.get('http://localhost:5000/users/items', {
+        const response = await axios.get('http://localhost:4000/users/items', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -42,7 +42,7 @@ const BuyItem = () => {
   const handleDelete = async (id) => {
     try {
       const authToken = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5000/items/${id}`, {
+      await axios.delete(`http://localhost:4000/items/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

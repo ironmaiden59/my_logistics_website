@@ -32,7 +32,7 @@ const RespondToBuyer = () => {
   const fetchMessages = useCallback(async () => {
     try {
       const authToken = localStorage.getItem('authToken');
-      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+      const messagesResponse = await axios.get(`http://localhost:4000/messages/item/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -47,7 +47,7 @@ const RespondToBuyer = () => {
     try {
       const authToken = localStorage.getItem('authToken');
       await axios.post(
-        'http://localhost:5000/users/associate-item',
+        'http://localhost:4000/users/associate-item',
         { itemId },
         {
           headers: {
@@ -88,7 +88,7 @@ const RespondToBuyer = () => {
     const fetchSellerFirstName = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
-        const response = await axios.get('http://localhost:5000/user/profile', {
+        const response = await axios.get('http://localhost:4000/user/profile', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -105,7 +105,7 @@ const RespondToBuyer = () => {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    const newSocket = io('http://localhost:5000'); // Connect to WebSocket server
+    const newSocket = io('http://localhost:4000'); // Connect to WebSocket server
     setSocket(newSocket);
 
     // Cleanup when the component unmounts
@@ -117,7 +117,7 @@ const RespondToBuyer = () => {
     const validateTokenAndFetchItem = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
-        const response = await axios.post('http://localhost:5000/messages/validate-token', {
+        const response = await axios.post('http://localhost:4000/messages/validate-token', {
           token: token,
         }, {
           headers: {

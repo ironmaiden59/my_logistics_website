@@ -46,7 +46,7 @@ useEffect(() => {
   const fetchBuyerFirstName = async () => {
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await axios.get('http://localhost:5000/user/profile', {
+      const response = await axios.get('http://localhost:4000/user/profile', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -63,7 +63,7 @@ useEffect(() => {
 
 // Establish WebSocket connection on component mount
 useEffect(() => {
-  const newSocket = io('http://localhost:5000');
+  const newSocket = io('http://localhost:4000');
   setSocket(newSocket);
 
   // Emit joinItemRoom event
@@ -80,7 +80,7 @@ useEffect(() => {
       const authToken = localStorage.getItem('authToken');
 
       // Fetch item by ID
-      const itemResponse = await axios.get(`http://localhost:5000/items/${id}`, {
+      const itemResponse = await axios.get(`http://localhost:4000/items/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -88,7 +88,7 @@ useEffect(() => {
       setItem(itemResponse.data);
 
       // Fetch messages related to the item
-      const messagesResponse = await axios.get(`http://localhost:5000/messages/item/${id}`, {
+      const messagesResponse = await axios.get(`http://localhost:4000/messages/item/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -96,7 +96,7 @@ useEffect(() => {
       setMessages(messagesResponse.data);
 
       // Generate a tokenized link using JWT
-      const linkResponse = await axios.get(`http://localhost:5000/items/${id}/generate-link`, {
+      const linkResponse = await axios.get(`http://localhost:4000/items/${id}/generate-link`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

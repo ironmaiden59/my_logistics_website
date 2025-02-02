@@ -28,7 +28,7 @@ const io = new Server(server, {
 // CORS middleware for HTTP routes
 const allowedOrigins = [
   'http://localhost:3000', // Your web app
-  'chrome-extension://dghlmhdbgcllfmfelhljdgpgjcffbbbp', // Your Chrome extension
+  'chrome-extension://bbbfhpdbeegpokbbbnbiihcpndhcckko', // Your Chrome extension
 ];
 
 app.use(cors({
